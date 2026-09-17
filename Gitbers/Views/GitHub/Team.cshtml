@@ -1,0 +1,307 @@
+﻿@model Gitbers.Models.Team
+
+@{
+    ViewData["Title"] = "GitHub активність";
+
+    var activities =
+        ViewBag.Activities as List<Gitbers.Models.GitHubActivity>
+        ?? new List<Gitbers.Models.GitHubActivity>();
+
+    var latestActivities = activities
+        .GroupBy(a => a.TeamMemberId)
+        .Select(g => g.OrderByDescending(a => a.ActivityDate).First())
+        .ToList();
+
+    var latestSync = activities
+        .OrderByDescending(a => a.ActivityDate)
+        .FirstOrDefault();
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1>@Model.Name</h1>
+
+            <p class="text-muted mb-0">
+                GitHub активність команди
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a asp-controller="Metrics"
+               asp-action="Index"
+               asp-route-id="@Model.TeamId"
+               class="btn btn-primary">
+                Метрики
+            </a>
+
+            <a asp-controller="Team"
+               asp-action="Details"
+               asp-route-id="@Model.TeamId"
+               class="btn btn-secondary">
+                Назад до команди
+            </a>
+
+        </div>
+
+    </div>
+
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+
+    <!-- Синхронізація -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="mb-3">
+                Синхронізація GitHub
+            </h4>
+
+            <p class="text-muted">
+                Система отримує активність учасників
+                за останні 7 днів.
+            </p>
+
+            <form asp-controller="GitHub"
+                  asp-action="Sync"
+                  asp-route-id="@Model.TeamId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Оновити GitHub активність
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- Поточна активність -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="mb-3">
+                Поточна активність
+            </h4>
+
+            @if (latestActivities.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover">
+
+                        <thead>
+                            <tr>
+                                <th>Учасник</th>
+                                <th>GitHub username</th>
+                                <th>Коміти</th>
+                                <th>Pull Requests</th>
+                                <th>Issues</th>
+                                <th>Reviews</th>
+                                <th>Синхронізація</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var member in Model.Members)
+                            {
+                                var activity = latestActivities
+                                    .FirstOrDefault(a =>
+                                        a.TeamMemberId == member.TeamMemberId);
+
+                                <tr>
+
+                                    <td>
+                                        @(member.User?.FullName
+                                            ?? member.User?.Email
+                                            ?? "—")
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            @member.GitHubUsername
+                                        </strong>
+                                    </td>
+
+                                    @if (activity != null)
+                                    {
+                                        <td>
+                                            <span class="badge bg-primary">
+                                                @activity.CommitsCount
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            @activity.PullRequestsCount
+                                        </td>
+
+                                        <td>
+                                            @activity.IssuesCount
+                                        </td>
+
+                                        <td>
+                                            @activity.ReviewsCount
+                                        </td>
+
+                                        <td>
+                                            @activity.ActivityDate
+                                            .ToString("dd.MM.yyyy HH:mm")
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td colspan="5"
+                                            class="text-muted">
+                                            Даних ще немає
+                                        </td>
+                                    }
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+                    GitHub активність ще не синхронізувалася.
+                    Натисніть «Оновити GitHub активність».
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- Інформація про останню синхронізацію -->
+    @if (latestSync != null)
+    {
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <h4>
+                    Остання синхронізація
+                </h4>
+
+                <p class="mb-0">
+                    @latestSync.ActivityDate
+                    .ToString("dd.MM.yyyy HH:mm:ss")
+                </p>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- Історія -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="mb-3">
+                Історія GitHub активності
+            </h4>
+
+            @if (activities.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-sm table-striped">
+
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>GitHub username</th>
+                                <th>Коміти</th>
+                                <th>PR</th>
+                                <th>Issues</th>
+                                <th>Reviews</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var activity in activities)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @activity.ActivityDate
+                                        .ToString("dd.MM.yyyy HH:mm")
+                                    </td>
+
+                                    <td>
+                                        @activity.GitHubUsername
+                                    </td>
+
+                                    <td>
+                                        @activity.CommitsCount
+                                    </td>
+
+                                    <td>
+                                        @activity.PullRequestsCount
+                                    </td>
+
+                                    <td>
+                                        @activity.IssuesCount
+                                    </td>
+
+                                    <td>
+                                        @activity.ReviewsCount
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    Історія поки порожня.
+                </p>
+            }
+
+        </div>
+
+    </div>
+
+</div>

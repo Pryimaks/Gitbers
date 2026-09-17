@@ -1,0 +1,68 @@
+﻿@model Gitbers.Models.Team
+
+@{
+    ViewData["Title"] = "Редагування команди";
+}
+
+<div class="container">
+
+    <h1>Редагування команди</h1>
+
+    <form asp-action="Edit" method="post">
+
+        <input type="hidden" asp-for="TeamId" />
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">
+                Назва команди
+            </label>
+
+            <input asp-for="Name" class="form-control" />
+
+            <span asp-validation-for="Name"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">
+                Опис
+            </label>
+
+            <textarea asp-for="Description"
+                      class="form-control"
+                      rows="4"></textarea>
+
+            <span asp-validation-for="Description"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="GitHubOrganization" class="form-label">
+                GitHub Organization
+            </label>
+
+            <input asp-for="GitHubOrganization"
+                   class="form-control" />
+
+            <span asp-validation-for="GitHubOrganization"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Зберегти зміни
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Скасувати
+        </a>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

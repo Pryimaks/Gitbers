@@ -1,0 +1,70 @@
+﻿@model Gitbers.Models.TeamMember
+
+@{
+    ViewData["Title"] = "Додавання учасника";
+}
+
+<div class="container mt-4">
+
+    <h1>Додавання учасника</h1>
+
+    <form asp-action="AddMember" asp-route-id="@Model.TeamId" method="post">
+
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="UserId" class="form-label">
+                Користувач
+            </label>
+
+            <select asp-for="UserId" class="form-select">
+                <option value="">-- Оберіть користувача --</option>
+
+                @foreach (var user in ViewBag.Users)
+                {
+                    <option value="@user.Id">
+                        @(string.IsNullOrEmpty(user.FullName)
+                            ? user.Email
+                            : $"{user.FullName} ({user.Email})")
+                    </option>
+                }
+            </select>
+
+            <span asp-validation-for="UserId"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="GitHubUsername" class="form-label">
+                GitHub username
+            </label>
+
+            <input asp-for="GitHubUsername"
+                   class="form-control"
+                   placeholder="Наприклад: Maks123" />
+
+            <span asp-validation-for="GitHubUsername"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Додати
+        </button>
+
+        <a asp-action="Details"
+           asp-route-id="@Model.TeamId"
+           class="btn btn-secondary">
+            Скасувати
+        </a>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

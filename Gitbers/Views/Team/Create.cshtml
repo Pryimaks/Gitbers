@@ -1,0 +1,58 @@
+﻿@model Gitbers.Models.Team
+
+@{
+    ViewData["Title"] = "Створення команди";
+}
+
+<div class="container mt-4">
+    <h1>Створення команди</h1>
+
+    <form asp-action="Create" method="post">
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">
+                Назва команди
+            </label>
+
+            <input asp-for="Name" class="form-control" />
+
+            <span asp-validation-for="Name"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">
+                Опис
+            </label>
+
+            <textarea asp-for="Description"
+                      class="form-control"
+                      rows="4"></textarea>
+
+            <span asp-validation-for="Description"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="GitHubOrganization" class="form-label">
+                GitHub Organization
+            </label>
+
+            <input asp-for="GitHubOrganization"
+                   class="form-control"
+                   placeholder="Наприклад: microsoft" />
+
+            <span asp-validation-for="GitHubOrganization"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Створити команду
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Скасувати
+        </a>
+
+    </form>
+</div>

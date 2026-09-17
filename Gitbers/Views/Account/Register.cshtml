@@ -1,0 +1,110 @@
+﻿@model Gitbers.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Реєстрація";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <h1 class="mb-4">Реєстрація</h1>
+
+            <form asp-action="Register" method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">
+                        Email
+                    </label>
+
+                    <input asp-for="Email"
+                           class="form-control"
+                           type="email" />
+
+                    <span asp-validation-for="Email"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">
+                        Пароль
+                    </label>
+
+                    <input asp-for="Password"
+                           class="form-control"
+                           type="password" />
+
+                    <span asp-validation-for="Password"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ConfirmPassword"
+                           class="form-label">
+                        Підтвердження пароля
+                    </label>
+
+                    <input asp-for="ConfirmPassword"
+                           class="form-control"
+                           type="password" />
+
+                    <span asp-validation-for="ConfirmPassword"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="FullName"
+                           class="form-label">
+                        Ім'я
+                    </label>
+
+                    <input asp-for="FullName"
+                           class="form-control" />
+
+                    <span asp-validation-for="FullName"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Phone"
+                           class="form-label">
+                        Телефон
+                    </label>
+
+                    <input asp-for="Phone"
+                           class="form-control" />
+
+                    <span asp-validation-for="Phone"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Зареєструватися
+                </button>
+
+                <a asp-action="Login"
+                   class="btn btn-secondary">
+                    Назад до входу
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,100 @@
+﻿@model Gitbers.Models.Team
+
+@{
+    ViewData["Title"] = "Команда";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@Model.Name</h1>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Назад
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+
+        <h4>Інформація про команду</h4>
+
+        <p>
+            <strong>Назва:</strong> @Model.Name
+        </p>
+
+        <p>
+            <strong>Опис:</strong> @Model.Description
+        </p>
+
+        <p>
+            <strong>GitHub Organization:</strong>
+            @Model.GitHubOrganization
+        </p>
+
+        <p>
+            <strong>Створено:</strong>
+            @Model.CreatedAt.ToString("dd.MM.yyyy")
+        </p>
+
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Учасники команди</h2>
+
+    <a asp-action="AddMember"
+       asp-route-id="@Model.TeamId"
+       class="btn btn-primary">
+        + Додати учасника
+    </a>
+    <a asp-controller="GitHub"
+       asp-action="Team"
+       asp-route-id="@Model.TeamId"
+       class="btn btn-dark">
+        GitHub активність
+    </a>
+</div>
+
+@if (Model.Members.Any())
+{
+    <table class="table table-bordered">
+
+        <thead>
+            <tr>
+                <th>Користувач</th>
+                <th>Email</th>
+                <th>GitHub username</th>
+                <th>Дата додавання</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var member in Model.Members)
+            {
+                <tr>
+                    <td>
+                        @(member.User?.FullName ?? "Без імені")
+                    </td>
+
+                    <td>
+                        @member.User?.Email
+                    </td>
+
+                    <td>
+                        @member.GitHubUsername
+                    </td>
+
+                    <td>
+                        @member.AddedAt.ToString("dd.MM.yyyy")
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        У цій команді ще немає учасників.
+    </div>
+}

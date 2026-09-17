@@ -1,0 +1,40 @@
+﻿@model Gitbers.Models.Team
+
+@{
+    ViewData["Title"] = "Видалення команди";
+}
+
+<h1>Видалення команди</h1>
+
+<div class="alert alert-danger">
+    <h4>Ти впевнений, що хочеш видалити цю команду?</h4>
+    <p>
+        Команда <strong>@Model.Name</strong> буде видалена.
+    </p>
+</div>
+
+<div class="card p-3 mb-3">
+    <p>
+        <strong>Назва:</strong> @Model.Name
+    </p>
+
+    <p>
+        <strong>Опис:</strong> @Model.Description
+    </p>
+
+    <p>
+        <strong>GitHub:</strong> @Model.GitHubOrganization
+    </p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="TeamId" />
+
+    <button type="submit" class="btn btn-danger">
+        Видалити
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Скасувати
+    </a>
+</form>

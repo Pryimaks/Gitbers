@@ -1,0 +1,42 @@
+﻿@model List<Gitbers.Models.Team>
+
+@{
+    ViewData["Title"] = "Команди";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Команди</h1>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            Команд поки немає.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var team in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h3 class="card-title">@team.Name</h3>
+
+                            @if (!string.IsNullOrEmpty(team.Description))
+                            {
+                                <p class="card-text">
+                                    @team.Description
+                                </p>
+                            }
+
+                            <p class="text-muted">
+                                Учасників: @(team.Members?.Count ?? 0)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
