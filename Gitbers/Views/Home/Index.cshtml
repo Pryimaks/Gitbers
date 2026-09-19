@@ -1,42 +1,1718 @@
 ﻿@model List<Gitbers.Models.Team>
 
 @{
-    ViewData["Title"] = "Команди";
+    ViewData["Title"] = "Головна";
+
+    var totalTeams = Model?.Count ?? 0;
+    var totalMembers = Model?.Sum(t => t.Members?.Count ?? 0) ?? 0;
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">Команди</h1>
+<div class="home-page">
 
-    @if (Model == null || !Model.Any())
-    {
-        <div class="alert alert-info">
-            Команд поки немає.
-        </div>
-    }
-    else
-    {
-        <div class="row">
-            @foreach (var team in Model)
-            {
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h3 class="card-title">@team.Name</h3>
+    <!-- ========================================= -->
+    <!-- HERO -->
+    <!-- ========================================= -->
 
-                            @if (!string.IsNullOrEmpty(team.Description))
-                            {
-                                <p class="card-text">
-                                    @team.Description
-                                </p>
-                            }
+    <section class="hero-section">
 
-                            <p class="text-muted">
-                                Учасників: @(team.Members?.Count ?? 0)
-                            </p>
-                        </div>
+        <div class="container">
+
+            <div class="hero-content">
+
+                <div class="hero-text">
+
+                    <div class="hero-badge">
+                        <span class="status-dot"></span>
+                        Система моніторингу команд
                     </div>
+
+                    <h1>
+                        Аналізуй команду.
+                        <span>Розумій її стан.</span>
+                    </h1>
+
+                    <p>
+                        Gitbers допомагає аналізувати активність команди
+                        на основі GitHub та додаткових опитувань,
+                        щоб отримувати об'єктивні показники
+                        командної взаємодії.
+                    </p>
+
+                    <div class="hero-actions">
+
+                        <a asp-controller="Team"
+                           asp-action="Create"
+                           class="btn btn-primary btn-lg hero-main-button">
+
+                            <i class="bi bi-plus-lg"></i>
+
+                            Створити команду
+
+                        </a>
+
+                        <a href="#teams"
+                           class="btn btn-light btn-lg hero-secondary-button">
+
+                            Переглянути команди
+
+                            <i class="bi bi-arrow-down"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- HERO GRAPHIC -->
+
+                <div class="hero-graphic">
+
+                    <div class="floating-card floating-card-one">
+
+                        <div class="floating-icon blue">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+
+                        <div>
+                            <span>Активність</span>
+                            <strong>Аналітика</strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-preview">
+
+                        <div class="preview-header">
+
+                            <div class="preview-title">
+                                <span></span>
+                                Показники команди
+                            </div>
+
+                            <i class="bi bi-three-dots"></i>
+
+                        </div>
+
+
+                        <div class="preview-chart">
+
+                            <div class="chart-line line-one"></div>
+                            <div class="chart-line line-two"></div>
+                            <div class="chart-line line-three"></div>
+
+                            <div class="chart-bars">
+
+                                <div style="height: 35%;"></div>
+                                <div style="height: 52%;"></div>
+                                <div style="height: 44%;"></div>
+                                <div style="height: 68%;"></div>
+                                <div style="height: 60%;"></div>
+                                <div style="height: 82%;"></div>
+                                <div style="height: 74%;"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="floating-card floating-card-two">
+
+                        <div class="floating-icon green">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+
+                        <div>
+                            <span>Команда</span>
+                            <strong>@totalMembers учасників</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ========================================= -->
+    <!-- STATISTICS -->
+    <!-- ========================================= -->
+
+    <section class="stats-section">
+
+        <div class="container">
+
+            <div class="stats-grid">
+
+                <!-- Teams -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>Всього команд</span>
+
+                        <strong>
+                            @totalTeams
+                        </strong>
+
+                        <small>
+                            створених команд
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Members -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon green">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>Учасників</span>
+
+                        <strong>
+                            @totalMembers
+                        </strong>
+
+                        <small>
+                            у всіх командах
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- GitHub -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon dark">
+                        <i class="bi bi-github"></i>
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>GitHub</span>
+
+                        <strong>
+                            API
+                        </strong>
+
+                        <small>
+                            джерело активності
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Monitoring -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon purple">
+                        <i class="bi bi-activity"></i>
+                    </div>
+
+                    <div class="stat-content">
+
+                        <span>Моніторинг</span>
+
+                        <strong>
+                            Активний
+                        </strong>
+
+                        <small>
+                            система готова
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ========================================= -->
+    <!-- TEAMS -->
+    <!-- ========================================= -->
+
+    <section class="teams-section" id="teams">
+
+        <div class="container">
+
+            <!-- SECTION HEADER -->
+
+            <div class="section-header">
+
+                <div>
+
+                    <div class="section-label">
+                        <i class="bi bi-people-fill"></i>
+                        КОМАНДИ
+                    </div>
+
+                    <h2>
+                        Твої команди
+                    </h2>
+
+                    <p>
+                        Обери команду, щоб переглянути її активність,
+                        показники та результати моніторингу.
+                    </p>
+
+                </div>
+
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="team-count">
+
+                        <strong>
+                            @totalTeams
+                        </strong>
+
+                        <span>
+                            @(totalTeams == 1 ? "команда" : "команд")
+                        </span>
+
+                    </div>
+                }
+
+            </div>
+
+
+
+            <!-- SEARCH -->
+            @if (Model != null && Model.Any())
+            {
+                <div class="search-wrapper">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="teamSearch"
+                           placeholder="Пошук команди..."
+                           autocomplete="off" />
+
+                    <button type="button"
+                            id="clearSearch"
+                            class="clear-search">
+
+                        <i class="bi bi-x-lg"></i>
+
+                    </button>
+
                 </div>
             }
+
+
+
+            <!-- ================================= -->
+            <!-- NO TEAMS -->
+            <!-- ================================= -->
+            @if (Model == null || !Model.Any())
+            {
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+
+                        <i class="bi bi-people"></i>
+
+                    </div>
+
+                    <h3>
+                        Тут поки порожньо
+                    </h3>
+
+                    <p>
+                        Створи свою першу команду, щоб почати
+                        збирати дані та аналізувати командний клімат.
+                    </p>
+
+                    <a asp-controller="Team"
+                       asp-action="Create"
+                       class="btn btn-primary btn-lg">
+
+                        <i class="bi bi-plus-lg"></i>
+
+                        Створити команду
+
+                    </a>
+
+                </div>
+            }
+            else
+            {
+
+                <!-- ================================= -->
+                <!-- TEAM CARDS -->
+                <!-- ================================= -->
+
+                <div class="teams-grid" id="teamsContainer">
+
+                    @foreach (var team in Model)
+                    {
+                        <div class="team-item"
+                             data-team-name="@team.Name.ToLower()">
+
+                            <div class="team-card">
+
+                                <!-- MAIN CLICKABLE AREA -->
+
+                                <a asp-controller="Team"
+                                   asp-action="Details"
+                                   asp-route-id="@team.TeamId"
+                                   class="team-main-link">
+
+                                    <!-- CARD TOP -->
+
+                                    <div class="team-card-top">
+
+                                        <div class="team-avatar">
+
+                                            <span>
+                                                @(string.IsNullOrWhiteSpace(team.Name)
+                                                    ? "?"
+                                                    : team.Name.Substring(0, 1).ToUpper())
+                                            </span>
+
+                                        </div>
+
+                                        <div class="team-menu">
+
+                                            <i class="bi bi-arrow-up-right"></i>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- TEAM NAME -->
+
+                                    <h3>
+                                        @team.Name
+                                    </h3>
+
+
+                                    <!-- DESCRIPTION -->
+                                    @if (!string.IsNullOrWhiteSpace(team.Description))
+                                    {
+                                        <p class="team-description">
+                                            @team.Description
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p class="team-description empty-description">
+                                            Опис команди ще не додано.
+                                        </p>
+                                    }
+
+
+                                    <!-- MEMBERS -->
+
+                                    <div class="team-members">
+
+                                        <div class="members-icon">
+
+                                            <i class="bi bi-person-fill"></i>
+
+                                        </div>
+
+                                        <div>
+
+                                            <span>
+                                                Учасники
+                                            </span>
+
+                                            <strong>
+                                                @(team.Members?.Count ?? 0)
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- OPEN -->
+
+                                    <div class="open-team">
+
+                                        <span>
+                                            Відкрити команду
+                                        </span>
+
+                                        <i class="bi bi-arrow-right"></i>
+
+                                    </div>
+
+                                </a>
+
+
+                                <!-- ACTIONS -->
+
+                                <div class="team-actions">
+
+                                    <a asp-controller="Metrics"
+                                       asp-action="Index"
+                                       asp-route-id="@team.TeamId"
+                                       class="team-action-button metrics-button">
+
+                                        <i class="bi bi-bar-chart-line"></i>
+
+                                        Метрики
+
+                                    </a>
+
+
+                                    <a asp-controller="GitHub"
+                                       asp-action="Team"
+                                       asp-route-id="@team.TeamId"
+                                       class="team-action-button github-button">
+
+                                        <i class="bi bi-github"></i>
+
+                                        GitHub
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- SEARCH EMPTY -->
+
+                <div id="noSearchResults"
+                     class="search-empty"
+                     style="display:none;">
+
+                    <div class="search-empty-icon">
+
+                        <i class="bi bi-search"></i>
+
+                    </div>
+
+                    <h3>
+                        Команду не знайдено
+                    </h3>
+
+                    <p>
+                        Спробуй змінити пошуковий запит.
+                    </p>
+
+                </div>
+
+            }
+
         </div>
-    }
+
+    </section>
+
+
+
+    <!-- ========================================= -->
+    <!-- FEATURES -->
+    <!-- ========================================= -->
+
+    <section class="features-section">
+
+        <div class="container">
+
+            <div class="section-header centered">
+
+                <div>
+
+                    <div class="section-label">
+                        <i class="bi bi-stars"></i>
+                        МОЖЛИВОСТІ
+                    </div>
+
+                    <h2>
+                        Все необхідне в одному місці
+                    </h2>
+
+                    <p>
+                        Система об'єднує дані про роботу команди
+                        та результати опитувань.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="features-grid">
+
+                <!-- Feature 1 -->
+
+                <div class="feature-card">
+
+                    <div class="feature-icon blue">
+
+                        <i class="bi bi-github"></i>
+
+                    </div>
+
+                    <h3>
+                        GitHub активність
+                    </h3>
+
+                    <p>
+                        Збір інформації про коміти,
+                        pull requests, issues та reviews
+                        учасників команди.
+                    </p>
+
+                </div>
+
+
+                <!-- Feature 2 -->
+
+                <div class="feature-card">
+
+                    <div class="feature-icon purple">
+
+                        <i class="bi bi-bar-chart-line"></i>
+
+                    </div>
+
+                    <h3>
+                        Аналітика метрик
+                    </h3>
+
+                    <p>
+                        Розрахунок показників активності,
+                        співпраці, стабільності та ризику.
+                    </p>
+
+                </div>
+
+
+                <!-- Feature 3 -->
+
+                <div class="feature-card">
+
+                    <div class="feature-icon green">
+
+                        <i class="bi bi-clipboard2-check"></i>
+
+                    </div>
+
+                    <h3>
+                        Анонімні опитування
+                    </h3>
+
+                    <p>
+                        Додаткове джерело інформації про
+                        комфорт та взаємодію всередині команди.
+                    </p>
+
+                </div>
+
+
+                <!-- Feature 4 -->
+
+                <div class="feature-card">
+
+                    <div class="feature-icon orange">
+
+                        <i class="bi bi-graph-up-arrow"></i>
+
+                    </div>
+
+                    <h3>
+                        Історія показників
+                    </h3>
+
+                    <p>
+                        Перегляд змін показників команди
+                        за різні періоди.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
 </div>
+
+
+
+<!-- ========================================= -->
+<!-- STYLES -->
+<!-- ========================================= -->
+
+<style>
+
+    /* ============================= */
+    /* GENERAL */
+    /* ============================= */
+
+    .home-page {
+        background: #f8fafc;
+        min-height: calc(100vh - 70px);
+        color: #172033;
+    }
+
+
+        .home-page .container {
+            max-width: 1280px;
+        }
+
+
+    /* ============================= */
+    /* HERO */
+    /* ============================= */
+
+    .hero-section {
+        background: radial-gradient( circle at 80% 20%, rgba(99, 102, 241, 0.18), transparent 30% ), linear-gradient( 135deg, #f8fafc 0%, #eef4ff 100% );
+        padding: 75px 0 70px;
+        overflow: hidden;
+    }
+
+
+    .hero-content {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(400px, 0.8fr);
+        gap: 70px;
+        align-items: center;
+    }
+
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 14px;
+        border-radius: 50px;
+        background: rgba(37, 99, 235, 0.08);
+        color: #2563eb;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 22px;
+    }
+
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34,197,94,0.12);
+    }
+
+
+    .hero-text h1 {
+        font-size: clamp(40px, 5vw, 68px);
+        line-height: 1.05;
+        letter-spacing: -2.5px;
+        font-weight: 800;
+        margin-bottom: 24px;
+        max-width: 700px;
+    }
+
+
+        .hero-text h1 span {
+            color: #2563eb;
+        }
+
+
+    .hero-text > p {
+        color: #64748b;
+        font-size: 18px;
+        line-height: 1.7;
+        max-width: 650px;
+        margin-bottom: 32px;
+    }
+
+
+    .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+
+    .hero-main-button {
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+
+    .hero-secondary-button {
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+        border: 1px solid #e2e8f0;
+    }
+
+
+    /* ============================= */
+    /* HERO GRAPHIC */
+    /* ============================= */
+
+    .hero-graphic {
+        position: relative;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    .dashboard-preview {
+        width: 420px;
+        height: 310px;
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 25px 60px rgba(15, 23, 42, 0.12);
+        padding: 24px;
+        transform: rotate(2deg);
+    }
+
+
+    .preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+
+    .preview-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+
+        .preview-title span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2563eb;
+        }
+
+
+    .preview-chart {
+        height: 220px;
+        position: relative;
+        border-left: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+
+    .chart-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        border-top: 1px dashed #e2e8f0;
+    }
+
+
+    .line-one {
+        top: 25%;
+    }
+
+
+    .line-two {
+        top: 50%;
+    }
+
+
+    .line-three {
+        top: 75%;
+    }
+
+
+    .chart-bars {
+        position: absolute;
+        left: 20px;
+        right: 15px;
+        bottom: 0;
+        top: 10px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        gap: 15px;
+    }
+
+
+        .chart-bars div {
+            width: 28px;
+            border-radius: 7px 7px 0 0;
+            background: linear-gradient( 180deg, #60a5fa, #2563eb );
+            opacity: 0.85;
+        }
+
+
+    .floating-card {
+        position: absolute;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 13px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+        z-index: 2;
+    }
+
+
+        .floating-card span {
+            display: block;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+
+        .floating-card strong {
+            display: block;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+
+    .floating-card-one {
+        top: 35px;
+        left: 5px;
+    }
+
+
+    .floating-card-two {
+        bottom: 30px;
+        right: 0;
+    }
+
+
+    .floating-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+        .floating-icon.blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+
+        .floating-icon.green {
+            background: #ecfdf5;
+            color: #16a34a;
+        }
+
+
+    /* ============================= */
+    /* STATS */
+    /* ============================= */
+
+    .stats-section {
+        margin-top: -35px;
+        position: relative;
+        z-index: 5;
+    }
+
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e8edf4;
+        border-radius: 16px;
+        padding: 22px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 8px 25px rgba(15,23,42,0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(15,23,42,0.09);
+        }
+
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+    }
+
+
+        .stat-icon.blue,
+        .feature-icon.blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+
+        .stat-icon.green,
+        .feature-icon.green {
+            background: #ecfdf5;
+            color: #16a34a;
+        }
+
+
+        .stat-icon.dark {
+            background: #f1f5f9;
+            color: #172033;
+        }
+
+
+        .stat-icon.purple,
+        .feature-icon.purple {
+            background: #f5f3ff;
+            color: #7c3aed;
+        }
+
+
+    .stat-content span {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
+
+    .stat-content strong {
+        display: block;
+        font-size: 23px;
+        line-height: 1.2;
+    }
+
+
+    .stat-content small {
+        color: #94a3b8;
+        font-size: 11px;
+    }
+
+
+    /* ============================= */
+    /* TEAMS */
+    /* ============================= */
+
+    .teams-section {
+        padding: 90px 0 80px;
+    }
+
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+
+        .section-header.centered {
+            justify-content: center;
+            text-align: center;
+        }
+
+
+    .section-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 9px;
+    }
+
+
+    .section-header h2 {
+        font-size: 34px;
+        letter-spacing: -1px;
+        font-weight: 750;
+        margin-bottom: 8px;
+    }
+
+
+    .section-header p {
+        color: #64748b;
+        margin: 0;
+        max-width: 620px;
+        line-height: 1.6;
+    }
+
+
+    .team-count {
+        display: flex;
+        align-items: baseline;
+        gap: 7px;
+        color: #64748b;
+    }
+
+
+        .team-count strong {
+            font-size: 28px;
+            color: #172033;
+        }
+
+
+    /* ============================= */
+    /* SEARCH */
+    /* ============================= */
+
+    .search-wrapper {
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+
+        .search-wrapper > i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            z-index: 2;
+        }
+
+
+        .search-wrapper input {
+            width: 100%;
+            height: 54px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            padding: 0 48px;
+            font-size: 15px;
+            color: #172033;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(15,23,42,0.03);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+
+            .search-wrapper input:focus {
+                border-color: #93c5fd;
+                box-shadow: 0 0 0 4px rgba(37,99,235,0.08);
+            }
+
+
+    .clear-search {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 34px;
+        height: 34px;
+        border: none;
+        background: #f1f5f9;
+        color: #64748b;
+        border-radius: 8px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+
+        .clear-search:hover {
+            background: #e2e8f0;
+        }
+
+
+    /* ============================= */
+    /* TEAM GRID */
+    /* ============================= */
+
+    .teams-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+    }
+
+
+    .team-card {
+        background: white;
+        border: 1px solid #e7ebf0;
+        border-radius: 18px;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+
+        .team-card:hover {
+            transform: translateY(-7px);
+            border-color: #bfdbfe;
+            box-shadow: 0 20px 45px rgba(15,23,42,0.10);
+        }
+
+
+    .team-main-link {
+        color: inherit;
+        text-decoration: none;
+        display: block;
+        flex: 1;
+        padding: 25px;
+    }
+
+
+    .team-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+
+    .team-avatar {
+        width: 58px;
+        height: 58px;
+        border-radius: 15px;
+        background: linear-gradient( 135deg, #2563eb, #4f46e5 );
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(37,99,235,0.22);
+    }
+
+
+    .team-menu {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        background: #f8fafc;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s ease, color 0.2s ease;
+    }
+
+
+    .team-card:hover .team-menu {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+
+    .team-card h3 {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.4px;
+        margin-bottom: 10px;
+    }
+
+
+    .team-description {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+        min-height: 45px;
+        margin-bottom: 22px;
+    }
+
+
+    .empty-description {
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+
+    .team-members {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 9px;
+        background: #f8fafc;
+        margin-bottom: 24px;
+    }
+
+
+    .members-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        background: #eff6ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+    }
+
+
+    .team-members span {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+
+    .team-members strong {
+        color: #172033;
+        display: block;
+        font-size: 14px;
+    }
+
+
+    .open-team {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #2563eb;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+
+        .open-team i {
+            transition: transform 0.2s ease;
+        }
+
+
+    .team-card:hover .open-team i {
+        transform: translateX(5px);
+    }
+
+
+    /* ============================= */
+    /* TEAM ACTIONS */
+    /* ============================= */
+
+    .team-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 0 25px 25px;
+    }
+
+
+    .team-action-button {
+        height: 40px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+
+    .metrics-button {
+        border: 1px solid #bfdbfe;
+        color: #2563eb;
+        background: #f8fbff;
+    }
+
+
+        .metrics-button:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+
+    .github-button {
+        border: 1px solid #d8dee6;
+        color: #334155;
+        background: #fafafa;
+    }
+
+
+        .github-button:hover {
+            background: #172033;
+            border-color: #172033;
+            color: white;
+        }
+
+
+    /* ============================= */
+    /* EMPTY */
+    /* ============================= */
+
+    .empty-state {
+        background: white;
+        border: 1px dashed #cbd5e1;
+        border-radius: 20px;
+        padding: 75px 30px;
+        text-align: center;
+    }
+
+
+    .empty-icon {
+        width: 82px;
+        height: 82px;
+        margin: 0 auto 20px;
+        border-radius: 20px;
+        background: #eff6ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 34px;
+    }
+
+
+    .empty-state h3 {
+        font-size: 23px;
+        margin-bottom: 10px;
+    }
+
+
+    .empty-state p {
+        max-width: 500px;
+        margin: 0 auto 25px;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+
+    /* ============================= */
+    /* SEARCH EMPTY */
+    /* ============================= */
+
+    .search-empty {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 55px 25px;
+        text-align: center;
+    }
+
+
+    .search-empty-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 15px;
+        border-radius: 15px;
+        background: #f1f5f9;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+
+    .search-empty h3 {
+        font-size: 20px;
+    }
+
+
+    .search-empty p {
+        color: #64748b;
+        margin: 0;
+    }
+
+
+    /* ============================= */
+    /* FEATURES */
+    /* ============================= */
+
+    .features-section {
+        background: white;
+        padding: 85px 0;
+    }
+
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-top: 40px;
+    }
+
+
+    .feature-card {
+        padding: 28px;
+        border: 1px solid #e8edf4;
+        border-radius: 16px;
+        background: #fff;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(15,23,42,0.07);
+        }
+
+
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+
+        .feature-icon.orange {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+
+    .feature-card h3 {
+        font-size: 17px;
+        margin-bottom: 9px;
+    }
+
+
+    .feature-card p {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.65;
+        margin: 0;
+    }
+
+
+    /* ============================= */
+    /* RESPONSIVE */
+    /* ============================= */
+
+    @@media (max-width: 1100px) {
+
+        .hero-content {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-graphic {
+            display: none;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .teams-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+
+    @@media (max-width: 700px) {
+
+        .hero-section {
+            padding: 50px 0;
+        }
+
+        .hero-text h1 {
+            font-size: 42px;
+            letter-spacing: -1.5px;
+        }
+
+        .stats-grid,
+        .teams-grid,
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .team-count {
+            display: none;
+        }
+    }
+
+
+    @@media (max-width: 500px) {
+
+        .hero-actions {
+            flex-direction: column;
+        }
+
+            .hero-actions .btn {
+                width: 100%;
+            }
+
+        .teams-section {
+            padding: 60px 0;
+        }
+    }
+
+</style>
+
+
+
+<!-- ========================================= -->
+<!-- SEARCH SCRIPT -->
+<!-- ========================================= -->
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput =
+            document.getElementById("teamSearch");
+
+        const clearButton =
+            document.getElementById("clearSearch");
+
+        const teamItems =
+            document.querySelectorAll(".team-item");
+
+        const noResults =
+            document.getElementById("noSearchResults");
+
+
+        if (!searchInput) {
+            return;
+        }
+
+
+        function searchTeams() {
+
+            const search =
+                searchInput.value
+                    .toLowerCase()
+                    .trim();
+
+            let visibleCount = 0;
+
+
+            teamItems.forEach(function (item) {
+
+                const name =
+                    item.getAttribute("data-team-name") || "";
+
+
+                if (name.includes(search)) {
+
+                    item.style.display = "";
+
+                    visibleCount++;
+
+                }
+                else {
+
+                    item.style.display = "none";
+
+                }
+
+            });
+
+
+            if (noResults) {
+
+                noResults.style.display =
+                    visibleCount === 0
+                        ? "block"
+                        : "none";
+
+            }
+
+
+            if (clearButton) {
+
+                clearButton.style.display =
+                    search.length > 0
+                        ? "flex"
+                        : "none";
+
+            }
+
+        }
+
+
+        searchInput.addEventListener(
+            "input",
+            searchTeams
+        );
+
+
+        if (clearButton) {
+
+            clearButton.addEventListener(
+                "click",
+                function () {
+
+                    searchInput.value = "";
+
+                    searchTeams();
+
+                    searchInput.focus();
+
+                }
+            );
+
+        }
+
+    });
+
+</script>

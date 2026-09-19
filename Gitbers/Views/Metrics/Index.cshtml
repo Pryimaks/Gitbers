@@ -19,12 +19,25 @@
             </p>
         </div>
 
-        <a asp-controller="GitHub"
-           asp-action="Team"
-           asp-route-id="@team?.TeamId"
-           class="btn btn-secondary">
-            GitHub активність
-        </a>
+        
+
+        <div class="d-flex gap-2">
+
+            <a asp-controller="Metrics"
+               asp-action="History"
+               asp-route-id="@team?.TeamId"
+               class="btn btn-outline-primary">
+                Історія метрик
+            </a>
+
+            <a asp-controller="GitHub"
+               asp-action="Team"
+               asp-route-id="@team?.TeamId"
+               class="btn btn-secondary">
+                GitHub активність
+            </a>
+
+        </div>
 
     </div>
 

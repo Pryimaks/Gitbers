@@ -1,0 +1,64 @@
+﻿@model Gitbers.Models.Survey
+
+@{
+    ViewData["Title"] = "Результати опитування";
+
+    var answers =
+        ViewBag.Answers as List<Gitbers.Models.SurveyAnswer>
+        ?? new List<Gitbers.Models.SurveyAnswer>();
+
+    double average = answers.Any()
+        ? answers.Average(a => a.Score)
+        : 0;
+
+    double score = average / 5 * 100;
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm">
+
+        <div class="card-body text-center p-5">
+
+            <h1>
+                Дякуємо за участь!
+            </h1>
+
+            <p class="text-muted">
+                Твої відповіді були збережені анонімно.
+            </p>
+
+            <div class="display-4 fw-bold mt-4">
+                @Math.Round(score, 1)
+            </div>
+
+            <p class="text-muted">
+                Середній індекс опитування
+            </p>
+
+            <div class="progress mt-4"
+                 style="height: 25px;">
+
+                <div class="progress-bar"
+                     role="progressbar"
+                     style="width: @score%;">
+                </div>
+
+            </div>
+
+            <div class="mt-4">
+
+                <a asp-controller="Metrics"
+                   asp-action="Index"
+                   asp-route-id="@Model.TeamId"
+                   class="btn btn-primary">
+                    Перейти до метрик
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

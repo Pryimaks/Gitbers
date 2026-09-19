@@ -32,20 +32,34 @@ namespace Gitbers.Services
             if (!team.Members.Any())
                 return null;
 
-            // Отримуємо активність учасників за вибраний період.
-            var activities = await _context.GitHubActivities
-                .Where(a =>
-                    team.Members
-                        .Select(m => m.TeamMemberId)
-                        .Contains(a.TeamMemberId)
-                    &&
-                    a.ActivityDate >= periodStart
-                    &&
-                    a.ActivityDate <= periodEnd)
-                .ToListAsync();
+            // Отримуємо всі записи активності команди
+            // за вибраний період.
+            var allActivities = await _context.GitHubActivities
+    .Where(a =>
+        team.Members
+            .Select(m => m.TeamMemberId)
+            .Contains(a.TeamMemberId)
+        &&
+        a.PeriodStart >= periodStart
+        &&
+        a.PeriodEnd <= periodEnd)
+    .ToListAsync();
+
+            if (!allActivities.Any())
+                return null;
+
+            // Якщо синхронізацію виконували декілька разів,
+            // беремо тільки останній запис для кожного учасника.
+            var activities = allActivities
+                .GroupBy(a => a.TeamMemberId)
+                .Select(g =>
+                    g.OrderByDescending(a => a.ActivityDate)
+                        .First())
+                .ToList();
 
             if (!activities.Any())
                 return null;
+
 
             // =================================================
             // 1. ACTIVITY SCORE
@@ -91,7 +105,7 @@ namespace Gitbers.Services
 
 
             // =================================================
-            // Створення snapshot
+            // Створення MetricSnapshot
             // =================================================
 
             var snapshot = new MetricSnapshot
@@ -102,16 +116,20 @@ namespace Gitbers.Services
                 PeriodEnd = periodEnd,
 
                 ActivityScore = Math.Round(
-                    activityScore, 2),
+                    activityScore,
+                    2),
 
                 CollaborationScore = Math.Round(
-                    collaborationScore, 2),
+                    collaborationScore,
+                    2),
 
                 StabilityScore = Math.Round(
-                    stabilityScore, 2),
+                    stabilityScore,
+                    2),
 
                 RiskScore = Math.Round(
-                    riskScore, 2),
+                    riskScore,
+                    2),
 
                 RiskLevel = riskLevel,
 
@@ -143,8 +161,7 @@ namespace Gitbers.Services
                 activities.Sum(a => a.PullRequestsCount);
 
             /*
-             * Для MVP використовуємо нормалізацію
-             * відносно заданого базового рівня.
+             * Нормалізація відносно базового рівня:
              *
              * 10 commits = 100%
              * 3 pull requests = 100%
@@ -183,8 +200,9 @@ namespace Gitbers.Services
                 activities.Sum(a => a.ReviewsCount);
 
             /*
-             * Code Review є основним показником
-             * взаємодії між розробниками.
+             * Pull Requests та Code Reviews
+             * використовуються як показники командної
+             * взаємодії.
              */
 
             double pullRequestsScore =
@@ -213,6 +231,11 @@ namespace Gitbers.Services
             if (activities.Count <= 1)
                 return 100;
 
+            /*
+             * Для кожного учасника визначаємо загальний
+             * обсяг GitHub активності.
+             */
+
             var memberActivity = activities
                 .GroupBy(a => a.TeamMemberId)
                 .Select(g =>
@@ -232,20 +255,40 @@ namespace Gitbers.Services
             if (average == 0)
                 return 0;
 
+            /*
+             * Дисперсія.
+             */
+
             double variance =
                 memberActivity
                     .Select(x =>
-                        Math.Pow(x - average, 2))
+                        Math.Pow(
+                            x - average,
+                            2))
                     .Average();
+
+            /*
+             * Середньоквадратичне відхилення.
+             */
 
             double standardDeviation =
                 Math.Sqrt(variance);
 
+            /*
+             * Коефіцієнт варіації.
+             */
+
             double coefficientOfVariation =
                 standardDeviation / average;
 
+            /*
+             * Чим менша нерівномірність активності,
+             * тим вищий Stability Score.
+             */
+
             double stability =
-                100 * (1 - coefficientOfVariation);
+                100 *
+                (1 - coefficientOfVariation);
 
             return Math.Clamp(
                 stability,
@@ -263,6 +306,11 @@ namespace Gitbers.Services
             double collaborationScore,
             double stabilityScore)
         {
+            /*
+             * Чим нижчі Activity, Collaboration та Stability,
+             * тим вищий розрахований індикатор ризику.
+             */
+
             double risk =
                 (100 - activityScore) * 0.40 +
                 (100 - collaborationScore) * 0.40 +

@@ -1,0 +1,449 @@
+﻿@using System.Text.Json
+@model List<Gitbers.Models.MetricSnapshot>
+
+@{
+    ViewData["Title"] = "Історія метрик";
+
+    var team = ViewBag.Team as Gitbers.Models.Team;
+
+    var labels = Model
+        .Select(x =>
+            $"{x.PeriodStart:dd.MM} - {x.PeriodEnd:dd.MM}")
+        .ToList();
+
+    var activityData = Model
+        .Select(x => x.ActivityScore)
+        .ToList();
+
+    var collaborationData = Model
+        .Select(x => x.CollaborationScore)
+        .ToList();
+
+    var stabilityData = Model
+        .Select(x => x.StabilityScore)
+        .ToList();
+
+    var riskData = Model
+        .Select(x => x.RiskScore)
+        .ToList();
+}
+
+<div class="container mt-4">
+
+    <!-- Заголовок -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1>Історія метрик</h1>
+
+            <p class="text-muted mb-0">
+                Команда:
+                <strong>@team?.Name</strong>
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a asp-controller="Metrics"
+               asp-action="Index"
+               asp-route-id="@team?.TeamId"
+               class="btn btn-primary">
+                Поточні метрики
+            </a>
+
+            <a asp-controller="GitHub"
+               asp-action="Team"
+               asp-route-id="@team?.TeamId"
+               class="btn btn-secondary">
+                GitHub активність
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Інформація -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="mb-3">
+                Моніторинг динаміки команди
+            </h4>
+
+            <p class="text-muted mb-0">
+                Графік відображає зміну показників командної
+                активності, взаємодії, стабільності та ризику
+                протягом різних періодів аналізу.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    @if (Model != null && Model.Any())
+    {
+        <!-- Графік -->
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <h4 class="mb-4">
+                    Динаміка метрик
+                </h4>
+
+                <div style="height: 450px;">
+
+                    <canvas id="metricsChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Таблиця -->
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h4 class="mb-3">
+                    Результати аналізу
+                </h4>
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Період
+                                </th>
+
+                                <th>
+                                    Activity
+                                </th>
+
+                                <th>
+                                    Collaboration
+                                </th>
+
+                                <th>
+                                    Stability
+                                </th>
+
+                                <th>
+                                    Risk
+                                </th>
+
+                                <th>
+                                    Рівень ризику
+                                </th>
+
+                                <th>
+                                    Розраховано
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var snapshot in Model
+                                .OrderByDescending(x => x.PeriodStart))
+                            {
+                                <tr>
+
+                                    <td>
+
+                                        <strong>
+                                            @snapshot.PeriodStart.ToString("dd.MM.yyyy")
+                                        </strong>
+
+                                        —
+
+                                        <strong>
+                                            @snapshot.PeriodEnd.ToString("dd.MM.yyyy")
+                                        </strong>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="badge bg-primary">
+                                            @snapshot.ActivityScore
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="badge bg-primary">
+                                            @snapshot.CollaborationScore
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="badge bg-primary">
+                                            @snapshot.StabilityScore
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="badge bg-primary">
+                                            @snapshot.RiskScore
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        @if (snapshot.RiskLevel == "Low")
+                                        {
+                                            <span class="badge bg-success">
+                                                Низький
+                                            </span>
+                                        }
+                                        else if (snapshot.RiskLevel == "Medium")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Середній
+                                            </span>
+                                        }
+                                        else if (snapshot.RiskLevel == "High")
+                                        {
+                                            <span class="badge bg-danger">
+                                                Високий
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @snapshot.RiskLevel
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <td>
+                                        @snapshot.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <!-- Якщо історії немає -->
+
+        <div class="card shadow-sm">
+
+            <div class="card-body text-center py-5">
+
+                <h4>
+                    Історія ще порожня
+                </h4>
+
+                <p class="text-muted">
+                    Після першого розрахунку метрик
+                    результати з'являться тут.
+                </p>
+
+                <a asp-controller="Metrics"
+                   asp-action="Index"
+                   asp-route-id="@team?.TeamId"
+                   class="btn btn-primary">
+                    Перейти до метрик
+                </a>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+
+@if (Model != null && Model.Any())
+{
+    <!-- Chart.js -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+        const labels = @Html.Raw(
+                    JsonSerializer.Serialize(labels)
+            );
+
+        const activityData = @Html.Raw(
+                    JsonSerializer.Serialize(activityData)
+            );
+
+        const collaborationData = @Html.Raw(
+                    JsonSerializer.Serialize(collaborationData)
+            );
+
+        const stabilityData = @Html.Raw(
+                    JsonSerializer.Serialize(stabilityData)
+            );
+
+        const riskData = @Html.Raw(
+                    JsonSerializer.Serialize(riskData)
+            );
+
+
+        const ctx = document
+            .getElementById('metricsChart')
+            .getContext('2d');
+
+
+        new Chart(ctx, {
+
+            type: 'line',
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+                        label: 'Activity Score',
+
+                        data: activityData,
+
+                        tension: 0.3,
+
+                        borderWidth: 2,
+
+                        fill: false
+                    },
+
+                    {
+                        label: 'Collaboration Score',
+
+                        data: collaborationData,
+
+                        tension: 0.3,
+
+                        borderWidth: 2,
+
+                        fill: false
+                    },
+
+                    {
+                        label: 'Stability Score',
+
+                        data: stabilityData,
+
+                        tension: 0.3,
+
+                        borderWidth: 2,
+
+                        fill: false
+                    },
+
+                    {
+                        label: 'Risk Score',
+
+                        data: riskData,
+
+                        tension: 0.3,
+
+                        borderWidth: 2,
+
+                        fill: false
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+
+                scales: {
+
+                    y: {
+
+                        min: 0,
+
+                        max: 100,
+
+                        title: {
+                            display: true,
+                            text: 'Значення показника'
+                        }
+
+                    },
+
+                    x: {
+
+                        title: {
+                            display: true,
+                            text: 'Період аналізу'
+                        }
+
+                    }
+
+                },
+
+                plugins: {
+
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+
+                    tooltip: {
+                        enabled: true
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+}

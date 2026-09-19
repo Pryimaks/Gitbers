@@ -4,6 +4,7 @@ using Gitbers.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gitbers.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260919052244_AddGitHubActivityPeriod")]
+    partial class AddGitHubActivityPeriod
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,11 +81,9 @@ namespace Gitbers.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("SnapshotId"));
 
                     b.Property<double>("ActivityScore")
-                        .HasPrecision(10, 4)
                         .HasColumnType("double");
 
                     b.Property<double>("CollaborationScore")
-                        .HasPrecision(10, 4)
                         .HasColumnType("double");
 
                     b.Property<DateTime>("CreatedAt")
@@ -100,11 +101,9 @@ namespace Gitbers.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<double>("RiskScore")
-                        .HasPrecision(10, 4)
                         .HasColumnType("double");
 
                     b.Property<double>("StabilityScore")
-                        .HasPrecision(10, 4)
                         .HasColumnType("double");
 
                     b.Property<int>("TeamId")
@@ -205,66 +204,6 @@ namespace Gitbers.Migrations
                             Description = "Гість системи",
                             Name = "Guest"
                         });
-                });
-
-            modelBuilder.Entity("Gitbers.Models.Survey", b =>
-                {
-                    b.Property<int>("SurveyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("SurveyId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("TeamId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("SurveyId");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("Surveys");
-                });
-
-            modelBuilder.Entity("Gitbers.Models.SurveyAnswer", b =>
-                {
-                    b.Property<int>("SurveyAnswerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("SurveyAnswerId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("QuestionNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SurveyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SurveyAnswerId");
-
-                    b.HasIndex("SurveyId");
-
-                    b.ToTable("SurveyAnswers");
                 });
 
             modelBuilder.Entity("Gitbers.Models.Team", b =>
@@ -398,28 +337,6 @@ namespace Gitbers.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Gitbers.Models.Survey", b =>
-                {
-                    b.HasOne("Gitbers.Models.Team", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("Gitbers.Models.SurveyAnswer", b =>
-                {
-                    b.HasOne("Gitbers.Models.Survey", "Survey")
-                        .WithMany("Answers")
-                        .HasForeignKey("SurveyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Survey");
-                });
-
             modelBuilder.Entity("Gitbers.Models.TeamMember", b =>
                 {
                     b.HasOne("Gitbers.Models.Team", "Team")
@@ -453,11 +370,6 @@ namespace Gitbers.Migrations
             modelBuilder.Entity("Gitbers.Models.Role", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Gitbers.Models.Survey", b =>
-                {
-                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("Gitbers.Models.Team", b =>

@@ -184,7 +184,6 @@ namespace Gitbers.Controllers
                 {
                     TeamMemberId = member.TeamMemberId,
                     GitHubUsername = member.GitHubUsername,
-
                     ActivityDate = DateTime.Now,
 
                     CommitsCount = commitsCount,

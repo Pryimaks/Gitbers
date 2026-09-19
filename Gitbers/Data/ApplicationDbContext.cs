@@ -14,6 +14,8 @@ namespace Gitbers.Data
         public DbSet<User> Users => Set<User>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<Team> Teams => Set<Team>();
+        public DbSet<Survey> Surveys => Set<Survey>();
+        public DbSet<SurveyAnswer> SurveyAnswers => Set<SurveyAnswer>();
         public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
         public DbSet<GitHubActivity> GitHubActivities => Set<GitHubActivity>();
         public DbSet<MetricSnapshot> MetricSnapshots => Set<MetricSnapshot>();
@@ -58,6 +60,38 @@ namespace Gitbers.Data
                 .WithMany()
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Survey>()
+               .HasOne(s => s.Team)
+               .WithMany()
+               .HasForeignKey(s => s.TeamId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SurveyAnswer>()
+                .HasOne(a => a.Survey)
+                .WithMany(s => s.Answers)
+                .HasForeignKey(a => a.SurveyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ==============================
+            // METRIC PRECISION
+            // ==============================
+
+            modelBuilder.Entity<MetricSnapshot>()
+                .Property(m => m.ActivityScore)
+                .HasPrecision(10, 4);
+
+            modelBuilder.Entity<MetricSnapshot>()
+                .Property(m => m.CollaborationScore)
+                .HasPrecision(10, 4);
+
+            modelBuilder.Entity<MetricSnapshot>()
+                .Property(m => m.StabilityScore)
+                .HasPrecision(10, 4);
+
+            modelBuilder.Entity<MetricSnapshot>()
+                .Property(m => m.RiskScore)
+                .HasPrecision(10, 4);
 
             modelBuilder.Entity<Role>().HasData(
                 new Role

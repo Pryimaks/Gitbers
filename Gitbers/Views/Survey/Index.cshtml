@@ -1,0 +1,226 @@
+﻿@model Gitbers.Models.Survey
+
+@{
+    ViewData["Title"] = "Анонімне опитування";
+}
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h1 class="mb-3">
+                        @Model.Title
+                    </h1>
+
+                    <p class="text-muted">
+                        Команда:
+                        <strong>
+                            @Model.Team?.Name
+                        </strong>
+                    </p>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p>
+                            @Model.Description
+                        </p>
+                    }
+
+                    <div class="alert alert-info">
+
+                        <strong>
+                            Анонімність
+                        </strong>
+
+                        <br />
+
+                        Відповіді не прив'язуються до
+                        користувача, email або GitHub username.
+
+                    </div>
+
+
+                    <form asp-controller="Survey"
+                          asp-action="Submit"
+                          asp-route-id="@Model.SurveyId"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+
+                        <!-- Питання 1 -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-bold">
+                                1. Наскільки комфортно тобі
+                                працювати в команді?
+                            </label>
+
+                            <select name="question1"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Обери оцінку
+                                </option>
+
+                                <option value="1">
+                                    1 — Дуже некомфортно
+                                </option>
+
+                                <option value="2">
+                                    2 — Некомфортно
+                                </option>
+
+                                <option value="3">
+                                    3 — Нейтрально
+                                </option>
+
+                                <option value="4">
+                                    4 — Комфортно
+                                </option>
+
+                                <option value="5">
+                                    5 — Дуже комфортно
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Питання 2 -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-bold">
+                                2. Наскільки ефективно учасники
+                                команди взаємодіють між собою?
+                            </label>
+
+                            <select name="question2"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Обери оцінку
+                                </option>
+
+                                <option value="1">1 — Дуже низько</option>
+                                <option value="2">2 — Низько</option>
+                                <option value="3">3 — Середньо</option>
+                                <option value="4">4 — Високо</option>
+                                <option value="5">5 — Дуже високо</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Питання 3 -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-bold">
+                                3. Наскільки ти задоволений
+                                розподілом роботи в команді?
+                            </label>
+
+                            <select name="question3"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Обери оцінку
+                                </option>
+
+                                <option value="1">1 — Дуже незадоволений</option>
+                                <option value="2">2 — Незадоволений</option>
+                                <option value="3">3 — Нейтрально</option>
+                                <option value="4">4 — Задоволений</option>
+                                <option value="5">5 — Дуже задоволений</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Питання 4 -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-bold">
+                                4. Наскільки безпечно тобі
+                                висловлювати свою думку в команді?
+                            </label>
+
+                            <select name="question4"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Обери оцінку
+                                </option>
+
+                                <option value="1">1 — Зовсім небезпечно</option>
+                                <option value="2">2 — Скоріше небезпечно</option>
+                                <option value="3">3 — Нейтрально</option>
+                                <option value="4">4 — Безпечно</option>
+                                <option value="5">5 — Повністю безпечно</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Питання 5 -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-bold">
+                                5. Як би ти оцінив загальну
+                                атмосферу в команді?
+                            </label>
+
+                            <select name="question5"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Обери оцінку
+                                </option>
+
+                                <option value="1">1 — Дуже погана</option>
+                                <option value="2">2 — Погана</option>
+                                <option value="3">3 — Нейтральна</option>
+                                <option value="4">4 — Хороша</option>
+                                <option value="5">5 — Дуже хороша</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Надіслати анонімні відповіді
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

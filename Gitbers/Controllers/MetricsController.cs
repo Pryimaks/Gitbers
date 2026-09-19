@@ -37,6 +37,25 @@ namespace Gitbers.Controllers
             return View(latestSnapshot);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> History(int id)
+        {
+            var team = await _context.Teams
+                .FirstOrDefaultAsync(t => t.TeamId == id);
+
+            if (team == null)
+                return NotFound();
+
+            var snapshots = await _context.MetricSnapshots
+                .Where(m => m.TeamId == id)
+                .OrderBy(m => m.PeriodStart)
+                .ToListAsync();
+
+            ViewBag.Team = team;
+
+            return View(snapshots);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Calculate(int id)

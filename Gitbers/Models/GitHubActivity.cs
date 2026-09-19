@@ -14,6 +14,12 @@ namespace Gitbers.Models
         [MaxLength(100)]
         public string GitHubUsername { get; set; } = string.Empty;
 
+        // Період, за який отримана GitHub активність
+        public DateTime PeriodStart { get; set; }
+
+        public DateTime PeriodEnd { get; set; }
+
+        // Дата та час фактичної синхронізації
         public DateTime ActivityDate { get; set; }
 
         public int CommitsCount { get; set; }
@@ -24,6 +30,6 @@ namespace Gitbers.Models
 
         public int ReviewsCount { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
