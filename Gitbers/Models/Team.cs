@@ -18,7 +18,9 @@ namespace Gitbers.Models
         public string? GitHubOrganization { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public int OwnerId { get; set; }
 
+        public User? Owner { get; set; }
         // Учасники команди
         public ICollection<TeamMember> Members { get; set; } = new List<TeamMember>();
 

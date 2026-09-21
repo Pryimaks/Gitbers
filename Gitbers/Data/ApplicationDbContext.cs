@@ -93,6 +93,12 @@ namespace Gitbers.Data
                 .Property(m => m.RiskScore)
                 .HasPrecision(10, 4);
 
+            modelBuilder.Entity<Team>()
+    .HasOne(t => t.Owner)
+    .WithMany()
+    .HasForeignKey(t => t.OwnerId)
+    .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Role>().HasData(
                 new Role
                 {

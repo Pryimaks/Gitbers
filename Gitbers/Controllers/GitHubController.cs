@@ -1,11 +1,14 @@
-﻿using Gitbers.Data;
+﻿using System.Security.Claims;
+using Gitbers.Data;
 using Gitbers.Models;
 using Gitbers.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gitbers.Controllers
 {
+    [Authorize]
     public class GitHubController : Controller
     {
         private readonly GitHubService _gitHubService;
@@ -19,13 +22,25 @@ namespace Gitbers.Controllers
             _context = context;
         }
 
+        // =========================================================
+        // GET: /GitHub/Team/2
+        // =========================================================
         [HttpGet]
         public async Task<IActionResult> Team(int id)
         {
+            var userId = GetCurrentUserId();
+
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            // Отримуємо тільки власну команду
             var team = await _context.Teams
+                .Where(t =>
+                    t.TeamId == id &&
+                    t.OwnerId == userId.Value)
                 .Include(t => t.Members)
                     .ThenInclude(m => m.User)
-                .FirstOrDefaultAsync(t => t.TeamId == id);
+                .FirstOrDefaultAsync();
 
             if (team == null)
                 return NotFound();
@@ -42,14 +57,25 @@ namespace Gitbers.Controllers
             return View(team);
         }
 
-
+        // =========================================================
+        // POST: /GitHub/Sync/2
+        // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Sync(int id)
         {
+            var userId = GetCurrentUserId();
+
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            // Перевіряємо, що команда належить поточному користувачу
             var team = await _context.Teams
+                .Where(t =>
+                    t.TeamId == id &&
+                    t.OwnerId == userId.Value)
                 .Include(t => t.Members)
-                .FirstOrDefaultAsync(t => t.TeamId == id);
+                .FirstOrDefaultAsync();
 
             if (team == null)
                 return NotFound();
@@ -59,7 +85,9 @@ namespace Gitbers.Controllers
                 TempData["Error"] =
                     "У команді немає учасників.";
 
-                return RedirectToAction(nameof(Team), new { id });
+                return RedirectToAction(
+                    nameof(Team),
+                    new { id });
             }
 
             var periodEnd = DateTime.UtcNow;
@@ -83,7 +111,6 @@ namespace Gitbers.Controllers
                     if (string.IsNullOrWhiteSpace(owner))
                         continue;
 
-
                     // ==========================================
                     // 1. COMMITS
                     // ==========================================
@@ -97,7 +124,6 @@ namespace Gitbers.Controllers
                             periodEnd);
 
                     commitsCount += commits.Count;
-
 
                     // ==========================================
                     // 2. PULL REQUESTS
@@ -121,7 +147,6 @@ namespace Gitbers.Controllers
 
                     pullRequestsCount += userPullRequests.Count;
 
-
                     // ==========================================
                     // 3. ISSUES
                     // ==========================================
@@ -141,7 +166,6 @@ namespace Gitbers.Controllers
                         .ToList();
 
                     issuesCount += userIssues.Count;
-
 
                     // ==========================================
                     // 4. CODE REVIEWS
@@ -175,7 +199,6 @@ namespace Gitbers.Controllers
                     }
                 }
 
-
                 // ==========================================
                 // Збереження результату
                 // ==========================================
@@ -202,7 +225,28 @@ namespace Gitbers.Controllers
             TempData["Success"] =
                 "GitHub активність команди успішно оновлено.";
 
-            return RedirectToAction(nameof(Team), new { id });
+            return RedirectToAction(
+                nameof(Team),
+                new { id });
+        }
+
+        // =========================================================
+        // Поточний користувач
+        // =========================================================
+        private int? GetCurrentUserId()
+        {
+            var userIdString =
+                User.FindFirstValue(
+                    ClaimTypes.NameIdentifier);
+
+            if (int.TryParse(
+                userIdString,
+                out int userId))
+            {
+                return userId;
+            }
+
+            return null;
         }
     }
 }

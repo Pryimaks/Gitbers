@@ -19,6 +19,19 @@ namespace Gitbers.Models
         [MaxLength(100)]
         public string GitHubUsername { get; set; } = string.Empty;
 
+        [MaxLength(20)]
+        public string? PhoneNumber { get; set; }
+
+        [MaxLength(100)]
+        public string? ViberUserId { get; set; }
+
+        public bool ViberConnected { get; set; } = false;
+
         public DateTime AddedAt { get; set; } = DateTime.UtcNow;
+
+        [MaxLength(20)]
+        public string? ViberConnectionCode { get; set; }
+
+        public DateTime? ViberConnectionCodeExpiresAt { get; set; }
     }
 }

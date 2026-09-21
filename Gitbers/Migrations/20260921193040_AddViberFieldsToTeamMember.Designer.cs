@@ -4,6 +4,7 @@ using Gitbers.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gitbers.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260921193040_AddViberFieldsToTeamMember")]
+    partial class AddViberFieldsToTeamMember
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -329,13 +332,6 @@ namespace Gitbers.Migrations
 
                     b.Property<bool>("ViberConnected")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("ViberConnectionCode")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<DateTime?>("ViberConnectionCodeExpiresAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("ViberUserId")
                         .HasMaxLength(100)

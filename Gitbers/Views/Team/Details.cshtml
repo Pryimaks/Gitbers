@@ -12,17 +12,26 @@
     </a>
 </div>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
 <div class="card mb-4">
     <div class="card-body">
 
         <h4>Інформація про команду</h4>
 
         <p>
-            <strong>Назва:</strong> @Model.Name
+            <strong>Назва:</strong>
+            @Model.Name
         </p>
 
         <p>
-            <strong>Опис:</strong> @Model.Description
+            <strong>Опис:</strong>
+            @Model.Description
         </p>
 
         <p>
@@ -38,59 +47,122 @@
     </div>
 </div>
 
+
 <div class="d-flex justify-content-between align-items-center mb-3">
+
     <h2>Учасники команди</h2>
 
-    <a asp-action="AddMember"
-       asp-route-id="@Model.TeamId"
-       class="btn btn-primary">
-        + Додати учасника
-    </a>
-    <a asp-controller="GitHub"
-       asp-action="Team"
-       asp-route-id="@Model.TeamId"
-       class="btn btn-dark">
-        GitHub активність
-    </a>
+    <div class="d-flex gap-2">
+
+        <a asp-action="AddMember"
+           asp-route-id="@Model.TeamId"
+           class="btn btn-primary">
+            + Додати учасника
+        </a>
+
+        <a asp-controller="GitHub"
+           asp-action="Team"
+           asp-route-id="@Model.TeamId"
+           class="btn btn-dark">
+            GitHub активність
+        </a>
+
+    </div>
+
 </div>
+
 
 @if (Model.Members.Any())
 {
-    <table class="table table-bordered">
+    <div class="table-responsive">
 
-        <thead>
-            <tr>
-                <th>Користувач</th>
-                <th>Email</th>
-                <th>GitHub username</th>
-                <th>Дата додавання</th>
-            </tr>
-        </thead>
+        <table class="table table-bordered table-hover align-middle">
 
-        <tbody>
-            @foreach (var member in Model.Members)
-            {
+            <thead class="table-light">
                 <tr>
-                    <td>
-                        @(member.User?.FullName ?? "Без імені")
-                    </td>
-
-                    <td>
-                        @member.User?.Email
-                    </td>
-
-                    <td>
-                        @member.GitHubUsername
-                    </td>
-
-                    <td>
-                        @member.AddedAt.ToString("dd.MM.yyyy")
-                    </td>
+                    <th>Користувач</th>
+                    <th>Email</th>
+                    <th>GitHub username</th>
+                    <th>Viber</th>
+                    <th>Дата додавання</th>
+                    <th style="width: 180px;">Дія</th>
                 </tr>
-            }
-        </tbody>
+            </thead>
 
-    </table>
+            <tbody>
+
+                @foreach (var member in Model.Members)
+                {
+                    <tr>
+
+                        <td>
+                            @(member.User?.FullName ?? "Без імені")
+                        </td>
+
+                        <td>
+                            @member.User?.Email
+                        </td>
+
+                        <td>
+                            <code>@member.GitHubUsername</code>
+                        </td>
+
+                        <td>
+
+                            @if (member.ViberConnected)
+                            {
+                                <span class="badge bg-success">
+                                    Підключено
+                                </span>
+                            }
+                            else if (!string.IsNullOrWhiteSpace(member.PhoneNumber))
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    Очікує підключення
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    Не налаштовано
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+                            @member.AddedAt.ToString("dd.MM.yyyy")
+                        </td>
+
+                        <td>
+
+                            @if (string.IsNullOrWhiteSpace(member.PhoneNumber))
+                            {
+                                <a asp-action="ConnectViber"
+                                   asp-route-id="@member.TeamMemberId"
+                                   class="btn btn-sm btn-primary">
+                                    Підключити Viber
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="ConnectViber"
+                                   asp-route-id="@member.TeamMemberId"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Змінити номер
+                                </a>
+                            }
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
 }
 else
 {

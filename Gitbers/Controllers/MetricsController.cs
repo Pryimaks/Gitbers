@@ -1,10 +1,13 @@
-﻿using Gitbers.Data;
+﻿using System.Security.Claims;
+using Gitbers.Data;
 using Gitbers.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gitbers.Controllers
 {
+    [Authorize]
     public class MetricsController : Controller
     {
         private readonly MetricsService _metricsService;
@@ -18,11 +21,22 @@ namespace Gitbers.Controllers
             _context = context;
         }
 
+        // =========================================================
+        // GET: /Metrics/Index/2
+        // =========================================================
         [HttpGet]
         public async Task<IActionResult> Index(int id)
         {
+            var userId = GetCurrentUserId();
+
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            // Отримуємо тільки власну команду
             var team = await _context.Teams
-                .FirstOrDefaultAsync(t => t.TeamId == id);
+                .FirstOrDefaultAsync(t =>
+                    t.TeamId == id &&
+                    t.OwnerId == userId.Value);
 
             if (team == null)
                 return NotFound();
@@ -37,11 +51,22 @@ namespace Gitbers.Controllers
             return View(latestSnapshot);
         }
 
+        // =========================================================
+        // GET: /Metrics/History/2
+        // =========================================================
         [HttpGet]
         public async Task<IActionResult> History(int id)
         {
+            var userId = GetCurrentUserId();
+
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            // Перевіряємо власника команди
             var team = await _context.Teams
-                .FirstOrDefaultAsync(t => t.TeamId == id);
+                .FirstOrDefaultAsync(t =>
+                    t.TeamId == id &&
+                    t.OwnerId == userId.Value);
 
             if (team == null)
                 return NotFound();
@@ -56,10 +81,28 @@ namespace Gitbers.Controllers
             return View(snapshots);
         }
 
+        // =========================================================
+        // POST: /Metrics/Calculate/2
+        // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Calculate(int id)
         {
+            var userId = GetCurrentUserId();
+
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            // Дуже важливо:
+            // не дозволяємо розраховувати метрики чужої команди
+            var teamExists = await _context.Teams
+                .AnyAsync(t =>
+                    t.TeamId == id &&
+                    t.OwnerId == userId.Value);
+
+            if (!teamExists)
+                return NotFound();
+
             var periodEnd = DateTime.Now;
             var periodStart = periodEnd.AddDays(-7);
 
@@ -86,6 +129,25 @@ namespace Gitbers.Controllers
             return RedirectToAction(
                 nameof(Index),
                 new { id });
+        }
+
+        // =========================================================
+        // Поточний користувач
+        // =========================================================
+        private int? GetCurrentUserId()
+        {
+            var userIdString =
+                User.FindFirstValue(
+                    ClaimTypes.NameIdentifier);
+
+            if (int.TryParse(
+                userIdString,
+                out int userId))
+            {
+                return userId;
+            }
+
+            return null;
         }
     }
 }

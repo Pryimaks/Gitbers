@@ -1,0 +1,129 @@
+﻿@model Gitbers.Models.TeamMember
+
+@{
+    ViewData["Title"] = "Підключення Viber";
+}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-7">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body p-4">
+
+                <h2 class="mb-4">
+                    Підключення Viber
+                </h2>
+
+                <div class="mb-4">
+
+                    <p class="mb-1">
+                        <strong>Учасник:</strong>
+                        @(Model.User?.FullName ?? "Без імені")
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>GitHub:</strong>
+                        @Model.GitHubUsername
+                    </p>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.PhoneNumber))
+                    {
+                        <p class="mb-0">
+                            <strong>Поточний номер:</strong>
+                            @Model.PhoneNumber
+                        </p>
+                    }
+
+                </div>
+
+                <hr />
+
+                <form asp-action="ConnectViber"
+                      method="post">
+
+                    <input type="hidden"
+                           name="id"
+                           value="@Model.TeamMemberId" />
+
+                    <div class="mb-3">
+
+                        <label for="phoneNumber"
+                               class="form-label">
+                            Номер телефону
+                        </label>
+
+                        <input type="tel"
+                               id="phoneNumber"
+                               name="phoneNumber"
+                               value="@Model.PhoneNumber"
+                               class="form-control"
+                               placeholder="+380671234567"
+                               maxlength="20"
+                               required />
+
+                        <div class="form-text">
+                            Номер потрібно вказати один раз.
+                            Після фактичного підключення Viber
+                            система зможе автоматично надсилати
+                            опитування цьому учаснику.
+                        </div>
+
+                        <span asp-validation-for="PhoneNumber"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger mb-3">
+                    </div>
+
+                    <div class="d-flex gap-2">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Зберегти номер
+                        </button>
+
+                        <a asp-action="Details"
+                           asp-route-id="@Model.TeamId"
+                           class="btn btn-secondary">
+                            Скасувати
+                        </a>
+
+                    </div>
+
+                </form>
+
+                @if (!string.IsNullOrWhiteSpace(Model.ViberConnectionCode))
+                {
+                    <div class="alert alert-info mt-4">
+
+                        <h5>Код підключення Viber</h5>
+
+                        <p>
+                            Передайте цей код учаснику команди:
+                        </p>
+
+                        <div class="fs-3 fw-bold text-center my-3">
+                            @Model.ViberConnectionCode
+                        </div>
+
+                        <p class="mb-0">
+                            Код дійсний до:
+                            @Model.ViberConnectionCodeExpiresAt?.ToLocalTime()
+                            .ToString("dd.MM.yyyy HH:mm")
+                        </p>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -4,71 +4,113 @@
     ViewData["Title"] = "Вхід";
 }
 
-<div class="container mt-5">
+<div class="container py-5">
+
     <div class="row justify-content-center">
-        <div class="col-md-5">
 
-            <h1 class="mb-4">Вхід</h1>
+        <div class="col-md-6 col-lg-5">
 
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success">
-                    @TempData["SuccessMessage"]
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="text-center mb-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-box-arrow-in-right fs-1 text-primary"></i>
+                        </div>
+
+                        <h2 class="fw-bold">
+                            Вхід до Gitbers
+                        </h2>
+
+                        <p class="text-muted">
+                            Увійди, щоб керувати своїми командами
+                        </p>
+
+                    </div>
+
+
+                    <form asp-action="Login"
+                          method="post">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger">
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="Email"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Email"
+                                   class="form-control"
+                                   placeholder="name@example.com" />
+
+                            <span asp-validation-for="Email"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-4">
+
+                            <label asp-for="Password"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Password"
+                                   class="form-control"
+                                   placeholder="Пароль" />
+
+                            <span asp-validation-for="Password"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <button type="submit"
+                                class="btn btn-primary w-100 py-2">
+
+                            <i class="bi bi-box-arrow-in-right me-1"></i>
+
+                            Увійти
+
+                        </button>
+
+                    </form>
+
+
+                    <div class="text-center mt-4">
+
+                        <span class="text-muted">
+                            Ще немає акаунта?
+                        </span>
+
+                        <a asp-action="Register"
+                           class="text-decoration-none fw-semibold">
+
+                            Зареєструватися
+
+                        </a>
+
+                    </div>
+
                 </div>
-            }
 
-            <form asp-action="Login" method="post">
-
-                <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3">
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label">
-                        Email
-                    </label>
-
-                    <input asp-for="Email"
-                           class="form-control"
-                           type="email" />
-
-                    <span asp-validation-for="Email"
-                          class="text-danger">
-                    </span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Password" class="form-label">
-                        Пароль
-                    </label>
-
-                    <input asp-for="Password"
-                           class="form-control"
-                           type="password" />
-
-                    <span asp-validation-for="Password"
-                          class="text-danger">
-                    </span>
-                </div>
-
-                <button type="submit"
-                        class="btn btn-primary">
-                    Увійти
-                </button>
-
-                <a asp-action="Register"
-                   class="btn btn-secondary">
-                    Реєстрація
-                </a>
-
-            </form>
+            </div>
 
         </div>
+
     </div>
+
 </div>
 
+
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }
