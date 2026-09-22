@@ -1,0 +1,135 @@
+﻿@model Gitbers.Models.SurveyInvitation
+
+@{
+    ViewData["Title"] = "Опитування";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <h1 class="mb-3">
+                @Model.Survey?.Title
+            </h1>
+
+            <p class="text-muted">
+                @Model.Survey?.Description
+            </p>
+
+            <div class="alert alert-info">
+                Ваші відповіді зберігаються без прив'язки
+                до облікового запису учасника.
+            </div>
+
+            <form asp-action="Take" method="post">
+
+                <input type="hidden"
+                       name="token"
+                       value="@Model.Token" />
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="All"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        1. Наскільки комфортно ти почуваєшся
+                        під час роботи в команді?
+                    </label>
+
+                    <select name="question1"
+                            class="form-select"
+                            required>
+                        <option value="">Оберіть оцінку</option>
+                        <option value="1">1 — Дуже некомфортно</option>
+                        <option value="2">2</option>
+                        <option value="3">3 — Нейтрально</option>
+                        <option value="4">4</option>
+                        <option value="5">5 — Дуже комфортно</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        2. Наскільки ефективно учасники команди
+                        взаємодіють між собою?
+                    </label>
+
+                    <select name="question2"
+                            class="form-select"
+                            required>
+                        <option value="">Оберіть оцінку</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        3. Наскільки справедливо розподіляється
+                        робота в команді?
+                    </label>
+
+                    <select name="question3"
+                            class="form-select"
+                            required>
+                        <option value="">Оберіть оцінку</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        4. Наскільки вільно ти можеш висловлювати
+                        власну думку в команді?
+                    </label>
+
+                    <select name="question4"
+                            class="form-select"
+                            required>
+                        <option value="">Оберіть оцінку</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        5. Як ти оцінюєш загальну атмосферу
+                        в команді?
+                    </label>
+
+                    <select name="question5"
+                            class="form-select"
+                            required>
+                        <option value="">Оберіть оцінку</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Надіслати відповіді
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+</div>

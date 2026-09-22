@@ -26,5 +26,21 @@ namespace Gitbers.Models
 
         // Знімки метрик
         public ICollection<MetricSnapshot> MetricSnapshots { get; set; } = new List<MetricSnapshot>();
+
+        /// <summary>
+        /// Власник GitHub-репозиторію.
+        /// Наприклад: microsoft
+        /// </summary>
+        [StringLength(100)]
+        public string? GitHubOwner { get; set; }
+
+        /// <summary>
+        /// Назва GitHub-репозиторію.
+        /// Наприклад: vscode
+        /// </summary>
+        [StringLength(100)]
+        public string? GitHubRepository { get; set; }
+
+       
     }
 }

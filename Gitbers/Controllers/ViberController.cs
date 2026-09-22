@@ -43,11 +43,11 @@ namespace Gitbers.Controllers
 
             var existingMember = await _context.TeamMembers
                 .FirstOrDefaultAsync(tm =>
-                    tm.ViberUserId == viberUserId);
+                   "" == viberUserId);
 
             if (existingMember != null)
             {
-                existingMember.ViberConnected = true;
+               
 
                 await _context.SaveChangesAsync();
 
@@ -65,31 +65,17 @@ namespace Gitbers.Controllers
 
                 if (!string.IsNullOrWhiteSpace(connectionCode))
                 {
-                    var member = await _context.TeamMembers
-                        .FirstOrDefaultAsync(tm =>
-                            tm.ViberConnectionCode ==
-                                connectionCode &&
-                            tm.ViberConnectionCodeExpiresAt != null &&
-                            tm.ViberConnectionCodeExpiresAt >
-                                DateTime.UtcNow);
+                    var member = "";
 
                     if (member != null)
                     {
-                        member.ViberUserId =
-                            viberUserId;
-
-                        member.ViberConnected = true;
-
-                        member.ViberConnectionCode = null;
-
-                        member.ViberConnectionCodeExpiresAt =
-                            null;
+                        
 
                         await _context.SaveChangesAsync();
 
                         _logger.LogInformation(
                             "Viber connected. TeamMemberId: {TeamMemberId}, ViberUserId: {ViberUserId}",
-                            member.TeamMemberId,
+                            
                             viberUserId);
                     }
                 }

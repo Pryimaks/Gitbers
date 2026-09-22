@@ -11,7 +11,9 @@ namespace Gitbers.Models
 
         public Team? Team { get; set; }
 
-        public int UserId { get; set; }
+        // Користувач Gitbers може бути відсутній.
+        // GitHub-учасник може ще не мати акаунта в системі.
+        public int? UserId { get; set; }
 
         public User? User { get; set; }
 
@@ -19,19 +21,14 @@ namespace Gitbers.Models
         [MaxLength(100)]
         public string GitHubUsername { get; set; } = string.Empty;
 
+        // Email, який використовується у GitHub-комітах.
+        // Може бути відсутнім, якщо GitHub його не повертає.
+        [MaxLength(200)]
+        public string? GitHubEmail { get; set; }
+
         [MaxLength(20)]
         public string? PhoneNumber { get; set; }
 
-        [MaxLength(100)]
-        public string? ViberUserId { get; set; }
-
-        public bool ViberConnected { get; set; } = false;
-
         public DateTime AddedAt { get; set; } = DateTime.UtcNow;
-
-        [MaxLength(20)]
-        public string? ViberConnectionCode { get; set; }
-
-        public DateTime? ViberConnectionCodeExpiresAt { get; set; }
     }
 }

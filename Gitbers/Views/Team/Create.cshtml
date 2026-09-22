@@ -1,58 +1,775 @@
-﻿@model Gitbers.Models.Team
+﻿@model Gitbers.Models.ViewModels.TeamCreateViewModel
 
 @{
     ViewData["Title"] = "Створення команди";
 }
 
 <div class="container mt-4">
-    <h1>Створення команди</h1>
 
-    <form asp-action="Create" method="post">
+    <div class="row justify-content-center">
 
-        <div class="mb-3">
-            <label asp-for="Name" class="form-label">
-                Назва команди
-            </label>
+        <div class="col-lg-8">
 
-            <input asp-for="Name" class="form-control" />
+            <div class="card shadow-sm">
 
-            <span asp-validation-for="Name"
-                  class="text-danger"></span>
+                <div class="card-body p-4">
+
+                    <h1 class="mb-4">
+                        Створення команди
+                    </h1>
+
+                    <form asp-action="Create"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <!-- Назва -->
+
+                        <div class="mb-3">
+
+                            <label asp-for="Name"
+                                   class="form-label">
+                                Назва команди
+                            </label>
+
+                            <input asp-for="Name"
+                                   class="form-control"
+                                   placeholder="Наприклад: Backend Team" />
+
+                            <span asp-validation-for="Name"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Опис -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="Description"
+                                   class="form-label">
+                                Опис
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Короткий опис команди">
+                            </textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- GitHub -->
+
+                        <div class="card bg-light border mb-4">
+
+                            <div class="card-body">
+
+                                <h5 class="card-title">
+                                    GitHub-проєкт
+                                </h5>
+
+                                <p class="text-muted mb-3">
+                                    Обери GitHub-репозиторій,
+                                    який буде пов'язаний
+                                    з цією командою.
+                                </p>
+
+
+                                <!-- Приховані поля -->
+
+                                <input asp-for="GitHubOwner"
+                                       type="hidden"
+                                       id="GitHubOwner" />
+
+                                <input asp-for="GitHubRepository"
+                                       type="hidden"
+                                       id="GitHubRepository" />
+
+
+                                <!-- Вибраний репозиторій -->
+
+                                <div id="selectedRepository"
+                                     class="alert alert-success d-none">
+
+                                    <div class="d-flex
+                                        justify-content-between
+                                        align-items-center">
+
+                                        <div>
+
+                                            <strong>
+                                                Вибраний проєкт:
+                                            </strong>
+
+                                            <div id="selectedRepositoryName"
+                                                 class="mt-1">
+                                            </div>
+
+                                        </div>
+
+                                        <button type="button"
+                                                class="btn btn-outline-danger btn-sm"
+                                                id="clearRepository">
+
+                                            Змінити
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Кнопка вибору -->
+
+                                <button type="button"
+                                        class="btn btn-dark"
+                                        id="openRepositories">
+
+                                    <i class="bi bi-github"></i>
+
+                                    Обрати GitHub-проєкт
+
+                                </button>
+
+                                <div class="form-text mt-2">
+
+                                    Після вибору проєкту
+                                    учасники репозиторію
+                                    будуть автоматично
+                                    доступні для команди.
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Кнопки -->
+
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                Створити команду
+
+                            </button>
+
+                            <a asp-action="Index"
+                               class="btn btn-secondary">
+
+                                Скасувати
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Description" class="form-label">
-                Опис
-            </label>
+    </div>
 
-            <textarea asp-for="Description"
-                      class="form-control"
-                      rows="4"></textarea>
-
-            <span asp-validation-for="Description"
-                  class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="GitHubOrganization" class="form-label">
-                GitHub Organization
-            </label>
-
-            <input asp-for="GitHubOrganization"
-                   class="form-control"
-                   placeholder="Наприклад: microsoft" />
-
-            <span asp-validation-for="GitHubOrganization"
-                  class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Створити команду
-        </button>
-
-        <a asp-action="Index" class="btn btn-secondary">
-            Скасувати
-        </a>
-
-    </form>
 </div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL GITHUB REPOSITORIES -->
+<!-- ========================================================= -->
+
+<div class="modal fade"
+     id="repositoriesModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Обрати GitHub-проєкт
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <!-- Пошук -->
+
+                <div class="mb-3">
+
+                    <input type="text"
+                           id="repositorySearch"
+                           class="form-control"
+                           placeholder="Пошук репозиторію..." />
+
+                </div>
+
+
+                <!-- Завантаження -->
+
+                <div id="repositoriesLoading"
+                     class="text-center py-4">
+
+                    <div class="spinner-border"
+                         role="status">
+                    </div>
+
+                    <div class="mt-2">
+                        Завантаження репозиторіїв...
+                    </div>
+
+                </div>
+
+
+                <!-- Помилка -->
+
+                <div id="repositoriesError"
+                     class="alert alert-danger d-none">
+                </div>
+
+
+                <!-- Список -->
+
+                <div id="repositoriesList">
+                </div>
+
+
+                <!-- Немає результатів -->
+
+                <div id="noRepositories"
+                     class="text-center text-muted py-4 d-none">
+
+                    Репозиторіїв не знайдено.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        let repositories = [];
+
+        let repositoriesModal;
+
+
+        // =========================================================
+        // ВІДКРИТТЯ MODAL
+        // =========================================================
+
+        document
+            .getElementById("openRepositories")
+            .addEventListener("click", async function() {
+
+                const modalElement =
+                    document.getElementById(
+                        "repositoriesModal"
+                    );
+
+                repositoriesModal =
+                    new bootstrap.Modal(
+                        modalElement
+                    );
+
+                repositoriesModal.show();
+
+                await loadRepositories();
+
+            });
+
+
+        // =========================================================
+        // ЗАВАНТАЖЕННЯ РЕПОЗИТОРІЇВ
+        // =========================================================
+
+        async function loadRepositories() {
+
+            const loading =
+                document.getElementById(
+                    "repositoriesLoading"
+                );
+
+            const error =
+                document.getElementById(
+                    "repositoriesError"
+                );
+
+            const list =
+                document.getElementById(
+                    "repositoriesList"
+                );
+
+            const noRepositories =
+                document.getElementById(
+                    "noRepositories"
+                );
+
+            loading.classList.remove("d-none");
+
+            error.classList.add("d-none");
+
+            noRepositories.classList.add(
+                "d-none"
+            );
+
+            list.innerHTML = "";
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/GitHub/Repositories"
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(
+                        data.message ??
+                        "Не вдалося отримати репозиторії GitHub."
+                    );
+                }
+
+                repositories =
+                    data.repositories ?? [];
+
+                loading.classList.add(
+                    "d-none"
+                );
+
+                renderRepositories(
+                    repositories
+                );
+
+            }
+            catch (errorObject) {
+
+                loading.classList.add(
+                    "d-none"
+                );
+
+                error.textContent =
+                    errorObject.message;
+
+                error.classList.remove(
+                    "d-none"
+                );
+
+            }
+        }
+
+
+        // =========================================================
+        // ВІДОБРАЖЕННЯ РЕПОЗИТОРІЇВ
+        // =========================================================
+
+        function renderRepositories(
+            repositoryArray
+        ) {
+
+            const list =
+                document.getElementById(
+                    "repositoriesList"
+                );
+
+            const noRepositories =
+                document.getElementById(
+                    "noRepositories"
+                );
+
+            list.innerHTML = "";
+
+
+            if (
+                !repositoryArray ||
+                repositoryArray.length === 0
+            ) {
+
+                noRepositories.classList.remove(
+                    "d-none"
+                );
+
+                return;
+
+            }
+
+
+            noRepositories.classList.add(
+                "d-none"
+            );
+
+
+            repositoryArray.forEach(
+                repository => {
+
+                    const owner =
+                        repository.owner?.login
+                        ?? "";
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+                    item.className =
+                        "card mb-2";
+
+
+                    const body =
+                        document.createElement(
+                            "div"
+                        );
+
+                    body.className =
+                        "card-body";
+
+
+                    const row =
+                        document.createElement(
+                            "div"
+                        );
+
+                    row.className =
+                        "d-flex " +
+                        "justify-content-between " +
+                        "align-items-center";
+
+
+                    // -------------------------------------------------
+                    // ЛІВА ЧАСТИНА
+                    // -------------------------------------------------
+
+                    const information =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    const name =
+                        document.createElement(
+                            "div"
+                        );
+
+                    name.className =
+                        "fw-bold";
+
+                    name.textContent =
+                        repository.name;
+
+
+                    const fullName =
+                        document.createElement(
+                            "div"
+                        );
+
+                    fullName.className =
+                        "text-muted small";
+
+                    fullName.textContent =
+                        repository.full_name;
+
+
+                    information.appendChild(
+                        name
+                    );
+
+                    information.appendChild(
+                        fullName
+                    );
+
+
+                    // -------------------------------------------------
+                    // ДОДАТКОВА ІНФОРМАЦІЯ
+                    // -------------------------------------------------
+
+                    if (
+                        repository.description
+                    ) {
+
+                        const description =
+                            document.createElement(
+                                "div"
+                            );
+
+                        description.className =
+                            "small mt-1";
+
+                        description.textContent =
+                            repository.description;
+
+                        information.appendChild(
+                            description
+                        );
+
+                    }
+
+
+                    const metadata =
+                        document.createElement(
+                            "div"
+                        );
+
+                    metadata.className =
+                        "small text-muted mt-1";
+
+
+                    const visibility =
+                        repository.private
+                            ? "Приватний"
+                            : "Публічний";
+
+
+                    metadata.textContent =
+                        visibility +
+                        (
+                            repository.language
+                                ? " • " +
+                                repository.language
+                                : ""
+                        );
+
+
+                    information.appendChild(
+                        metadata
+                    );
+
+
+                    // -------------------------------------------------
+                    // КНОПКА
+                    // -------------------------------------------------
+
+                    const button =
+                        document.createElement(
+                            "button"
+                        );
+
+                    button.type =
+                        "button";
+
+                    button.className =
+                        "btn btn-primary";
+
+                    button.textContent =
+                        "Обрати";
+
+
+                    button.addEventListener(
+                        "click",
+                        function() {
+
+                            selectRepository(
+                                repository
+                            );
+
+                        }
+                    );
+
+
+                    row.appendChild(
+                        information
+                    );
+
+                    row.appendChild(
+                        button
+                    );
+
+                    body.appendChild(
+                        row
+                    );
+
+                    item.appendChild(
+                        body
+                    );
+
+                    list.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+        }
+
+
+        // =========================================================
+        // ПОШУК
+        // =========================================================
+
+        document
+            .getElementById(
+                "repositorySearch"
+            )
+            .addEventListener(
+                "input",
+                function() {
+
+                    const search =
+                        this.value
+                            .trim()
+                            .toLowerCase();
+
+
+                    const filtered =
+                        repositories.filter(
+                            repository => {
+
+                                const name =
+                                    repository.name
+                                        ?.toLowerCase()
+                                    ?? "";
+
+                                const fullName =
+                                    repository.full_name
+                                        ?.toLowerCase()
+                                    ?? "";
+
+                                const description =
+                                    repository.description
+                                        ?.toLowerCase()
+                                    ?? "";
+
+                                return (
+                                    name.includes(search) ||
+                                    fullName.includes(search) ||
+                                    description.includes(search)
+                                );
+
+                            }
+                        );
+
+
+                    renderRepositories(
+                        filtered
+                    );
+
+                }
+            );
+
+
+        // =========================================================
+        // ВИБІР РЕПОЗИТОРІЮ
+        // =========================================================
+
+        function selectRepository(
+            repository
+        ) {
+
+            const owner =
+                repository.owner?.login
+                ?? "";
+
+
+            document.getElementById(
+                "GitHubOwner"
+            ).value =
+                owner;
+
+
+            document.getElementById(
+                "GitHubRepository"
+            ).value =
+                repository.name;
+
+
+            document.getElementById(
+                "selectedRepositoryName"
+            ).textContent =
+                repository.full_name;
+
+
+            document.getElementById(
+                "selectedRepository"
+            ).classList.remove(
+                "d-none"
+            );
+
+
+            document.getElementById(
+                "openRepositories"
+            ).classList.add(
+                "d-none"
+            );
+
+
+            if (repositoriesModal) {
+
+                repositoriesModal.hide();
+
+            }
+
+        }
+
+
+        // =========================================================
+        // ОЧИСТИТИ ВИБІР
+        // =========================================================
+
+        document
+            .getElementById(
+                "clearRepository"
+            )
+            .addEventListener(
+                "click",
+                function() {
+
+                    document.getElementById(
+                        "GitHubOwner"
+                    ).value = "";
+
+
+                    document.getElementById(
+                        "GitHubRepository"
+                    ).value = "";
+
+
+                    document.getElementById(
+                        "selectedRepository"
+                    ).classList.add(
+                        "d-none"
+                    );
+
+
+                    document.getElementById(
+                        "openRepositories"
+                    ).classList.remove(
+                        "d-none"
+                    );
+
+                }
+            );
+
+    </script>
+}

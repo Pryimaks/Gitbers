@@ -4,6 +4,7 @@ using Gitbers.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gitbers.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260922182015_AddGitHubRepositoryToTeam1")]
+    partial class AddGitHubRepositoryToTeam1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -360,10 +363,6 @@ namespace Gitbers.Migrations
                     b.Property<DateTime>("AddedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("GitHubEmail")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
                     b.Property<string>("GitHubUsername")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -376,8 +375,22 @@ namespace Gitbers.Migrations
                     b.Property<int>("TeamId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("ViberConnected")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ViberConnectionCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTime?>("ViberConnectionCodeExpiresAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ViberUserId")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.HasKey("TeamMemberId");
 
@@ -522,7 +535,8 @@ namespace Gitbers.Migrations
                     b.HasOne("Gitbers.Models.User", "User")
                         .WithMany("TeamMembers")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Team");
 

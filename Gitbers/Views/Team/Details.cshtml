@@ -2,24 +2,42 @@
 
 @{
     ViewData["Title"] = "Команда";
+    var activeSurvey = ViewBag.ActiveSurvey as Gitbers.Models.Survey;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
+
     <h1>@Model.Name</h1>
 
-    <a asp-action="Index" class="btn btn-secondary">
+    <a asp-action="Index"
+       class="btn btn-secondary">
         Назад
     </a>
+
 </div>
 
-@if (TempData["SuccessMessage"] != null)
+
+@if (TempData["Success"] != null)
 {
     <div class="alert alert-success">
-        @TempData["SuccessMessage"]
+        @TempData["Success"]
     </div>
 }
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+
+<!-- ============================================================ -->
+<!-- ІНФОРМАЦІЯ ПРО КОМАНДУ -->
+<!-- ============================================================ -->
+
 <div class="card mb-4">
+
     <div class="card-body">
 
         <h4>Інформація про команду</h4>
@@ -35,20 +53,114 @@
         </p>
 
         <p>
-            <strong>GitHub Organization:</strong>
-            @Model.GitHubOrganization
-        </p>
-
-        <p>
             <strong>Створено:</strong>
             @Model.CreatedAt.ToString("dd.MM.yyyy")
         </p>
 
+
+        <!-- ==================================================== -->
+        <!-- GITHUB ПРОЄКТ -->
+        <!-- ==================================================== -->
+        @if (!string.IsNullOrWhiteSpace(Model.GitHubOwner) &&
+                     !string.IsNullOrWhiteSpace(Model.GitHubRepository))
+        {
+            <div class="alert alert-success mt-3 mb-0">
+
+                <div class="d-flex justify-content-between
+                    align-items-start flex-wrap gap-3">
+
+                    <div>
+
+                        <strong>GitHub-проєкт:</strong>
+
+                        <div class="mt-1">
+
+                            <a href="https://github.com/@Model.GitHubOwner/@Model.GitHubRepository"
+                               target="_blank"
+                               rel="noopener noreferrer">
+
+                                @Model.GitHubOwner/@Model.GitHubRepository
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <span class="badge bg-success">
+                            Підключено
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <hr />
+
+
+                <div class="mb-2">
+
+                    Учасників GitHub-проєкту:
+
+                    <strong>
+                        @Model.Members.Count
+                    </strong>
+
+                </div>
+
+
+                <form asp-controller="GitHub"
+                      asp-action="RefreshMembers"
+                      method="post"
+                      class="mt-2">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="teamId"
+                           value="@Model.TeamId" />
+
+                    <button type="submit"
+                            class="btn btn-outline-success">
+
+                        Оновити учасників з GitHub
+
+                    </button>
+
+                </form>
+
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning mt-3 mb-0">
+
+                <strong>GitHub-проєкт не підключено.</strong>
+
+                <div class="mt-2">
+
+                    Для цієї команди ще не вибрано
+                    GitHub-репозиторій.
+
+                </div>
+
+            </div>
+        }
+
     </div>
+
 </div>
 
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<!-- ============================================================ -->
+<!-- УЧАСНИКИ -->
+<!-- ============================================================ -->
+
+<div class="d-flex justify-content-between
+    align-items-center mb-3">
 
     <h2>Учасники команди</h2>
 
@@ -57,14 +169,18 @@
         <a asp-action="AddMember"
            asp-route-id="@Model.TeamId"
            class="btn btn-primary">
+
             + Додати учасника
+
         </a>
 
         <a asp-controller="GitHub"
            asp-action="Team"
            asp-route-id="@Model.TeamId"
            class="btn btn-dark">
+
             GitHub активність
+
         </a>
 
     </div>
@@ -72,22 +188,88 @@
 </div>
 
 
+<!-- ============================================================ -->
+<!-- ОПИТУВАННЯ -->
+<!-- ============================================================ -->
+@if (activeSurvey != null)
+{
+    <div class="alert alert-info mb-4">
+
+        <strong>Активне опитування:</strong>
+
+        @activeSurvey.Title
+
+        <div class="mt-2">
+
+            Для учасників можна створити персональні
+            посилання на це опитування та надіслати
+            їх у Viber.
+
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="alert alert-warning mb-4">
+
+        Для цієї команди немає активного опитування.
+
+        <a asp-controller="Survey"
+           asp-action="Create"
+           asp-route-teamId="@Model.TeamId"
+           class="alert-link">
+
+            Створити опитування
+
+        </a>
+
+    </div>
+}
+
+
+<!-- ============================================================ -->
+<!-- СПИСОК УЧАСНИКІВ -->
+<!-- ============================================================ -->
 @if (Model.Members.Any())
 {
     <div class="table-responsive">
 
-        <table class="table table-bordered table-hover align-middle">
+        <table class="table table-bordered
+            table-hover align-middle">
 
             <thead class="table-light">
+
                 <tr>
-                    <th>Користувач</th>
-                    <th>Email</th>
-                    <th>GitHub username</th>
-                    <th>Viber</th>
-                    <th>Дата додавання</th>
-                    <th style="width: 180px;">Дія</th>
+
+                    <th>
+                        Користувач
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        GitHub username
+                    </th>
+
+                    <th>
+                        Viber
+                    </th>
+
+                    <th>
+                        Дата додавання
+                    </th>
+
+                    <th style="width: 260px;">
+                        Дія
+                    </th>
+
                 </tr>
+
             </thead>
+
 
             <tbody>
 
@@ -99,59 +281,104 @@
                             @(member.User?.FullName ?? "Без імені")
                         </td>
 
+
                         <td>
                             @member.User?.Email
                         </td>
 
+
                         <td>
-                            <code>@member.GitHubUsername</code>
+                            <code>
+                                @member.GitHubUsername
+                            </code>
                         </td>
 
+
                         <td>
 
-                            @if (member.ViberConnected)
+                            @if (!string.IsNullOrWhiteSpace(
+                                member.PhoneNumber))
                             {
                                 <span class="badge bg-success">
-                                    Підключено
-                                </span>
-                            }
-                            else if (!string.IsNullOrWhiteSpace(member.PhoneNumber))
-                            {
-                                <span class="badge bg-warning text-dark">
-                                    Очікує підключення
+
+                                    @member.PhoneNumber
+
                                 </span>
                             }
                             else
                             {
                                 <span class="badge bg-secondary">
-                                    Не налаштовано
+
+                                    Номер не вказано
+
                                 </span>
                             }
 
                         </td>
 
+
                         <td>
                             @member.AddedAt.ToString("dd.MM.yyyy")
                         </td>
 
+
                         <td>
 
-                            @if (string.IsNullOrWhiteSpace(member.PhoneNumber))
-                            {
-                                <a asp-action="ConnectViber"
-                                   asp-route-id="@member.TeamMemberId"
-                                   class="btn btn-sm btn-primary">
-                                    Підключити Viber
-                                </a>
-                            }
-                            else
-                            {
-                                <a asp-action="ConnectViber"
-                                   asp-route-id="@member.TeamMemberId"
-                                   class="btn btn-sm btn-outline-primary">
-                                    Змінити номер
-                                </a>
-                            }
+                            <div class="d-flex gap-2 flex-wrap">
+
+
+                                <!-- ================================= -->
+                                <!-- НОМЕР ТЕЛЕФОНУ -->
+                                <!-- ================================= -->
+                                @if (string.IsNullOrWhiteSpace(
+                                                                    member.PhoneNumber))
+                                {
+                                    <a asp-action="ConnectViber"
+                                       asp-route-id="@member.TeamMemberId"
+                                       class="btn btn-sm btn-outline-primary">
+
+                                        Додати номер
+
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-action="ConnectViber"
+                                       asp-route-id="@member.TeamMemberId"
+                                       class="btn btn-sm btn-outline-primary">
+
+                                        Змінити номер
+
+                                    </a>
+                                }
+
+
+                                <!-- ================================= -->
+                                <!-- ОПИТУВАННЯ -->
+                                <!-- ================================= -->
+                                @if (activeSurvey != null)
+                                {
+                                    <button type="button"
+                                            class="btn btn-sm btn-success"
+                                            onclick="createSurveyLink(
+                                        @activeSurvey.SurveyId,
+                                        @member.TeamMemberId,
+                                        this
+                                        )">
+
+                                        Створити посилання
+
+                                    </button>
+                                }
+
+                            </div>
+
+
+                            <!-- Посилання на опитування -->
+
+                            <div class="mt-2 survey-link-container"
+                                 id="survey-link-@member.TeamMemberId">
+                            </div>
 
                         </td>
 
@@ -167,6 +394,155 @@
 else
 {
     <div class="alert alert-info">
+
         У цій команді ще немає учасників.
+
     </div>
+}
+
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT -->
+<!-- ============================================================ -->
+@section Scripts
+{
+    <script>
+
+        // =========================================================
+        // СТВОРЕННЯ ПОСИЛАННЯ НА ОПИТУВАННЯ
+        // =========================================================
+
+        async function createSurveyLink(
+            surveyId,
+            teamMemberId,
+            button) {
+            button.disabled = true;
+
+            button.innerText =
+                "Створення...";
+
+
+            try {
+                const response =
+                    await fetch(
+                        `/Survey/CreateInvitation?surveyId=${surveyId}&teamMemberId=${teamMemberId}`
+                    );
+
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Помилка створення посилання."
+                    );
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                if (!data.success ||
+                    !data.url) {
+                    throw new Error(
+                        "Посилання не було створено."
+                    );
+                }
+
+
+                const container =
+                    document.getElementById(
+                        `survey-link-${teamMemberId}`
+                    );
+
+
+                container.innerHTML = `
+
+                            <div class="input-group input-group-sm">
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    value="${data.url}"
+                                    readonly />
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    onclick="copySurveyLink(
+                                        '${data.url}',
+                                        this
+                                    )">
+
+                                    Копіювати
+
+                                </button>
+
+                            </div>
+
+                            <small class="text-muted">
+
+                                Скопіюй посилання та надішли
+                                його учаснику у Viber.
+
+                            </small>
+
+                        `;
+
+
+                button.innerText =
+                    "Посилання створено";
+            }
+            catch (error) {
+                alert(
+                    error.message
+                );
+
+
+                button.disabled =
+                    false;
+
+
+                button.innerText =
+                    "Створити посилання";
+            }
+        }
+
+
+        // =========================================================
+        // КОПІЮВАННЯ ПОСИЛАННЯ
+        // =========================================================
+
+        async function copySurveyLink(
+            url,
+            button) {
+            try {
+                await navigator
+                    .clipboard
+                    .writeText(url);
+
+
+                const oldText =
+                    button.innerText;
+
+
+                button.innerText =
+                    "Скопійовано";
+
+
+                setTimeout(
+                    () => {
+                        button.innerText =
+                            oldText;
+                    },
+                    2000
+                );
+            }
+            catch {
+                alert(
+                    "Не вдалося скопіювати посилання. " +
+                    "Скопіюй його вручну."
+                );
+            }
+        }
+
+    </script>
 }

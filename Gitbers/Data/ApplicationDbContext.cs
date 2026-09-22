@@ -19,6 +19,7 @@ namespace Gitbers.Data
         public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
         public DbSet<GitHubActivity> GitHubActivities => Set<GitHubActivity>();
         public DbSet<MetricSnapshot> MetricSnapshots => Set<MetricSnapshot>();
+        public DbSet<SurveyInvitation> SurveyInvitations => Set<SurveyInvitation>();
         public DbSet<Notification> Notifications => Set<Notification>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -72,6 +73,22 @@ namespace Gitbers.Data
                 .WithMany(s => s.Answers)
                 .HasForeignKey(a => a.SurveyId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SurveyInvitation>()
+    .HasOne(i => i.Survey)
+    .WithMany()
+    .HasForeignKey(i => i.SurveyId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SurveyInvitation>()
+                .HasOne(i => i.TeamMember)
+                .WithMany()
+                .HasForeignKey(i => i.TeamMemberId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SurveyInvitation>()
+                .HasIndex(i => i.Token)
+                .IsUnique();
 
             // ==============================
             // METRIC PRECISION

@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using Gitbers.Data;
 using Gitbers.Models;
 using Gitbers.Services;
@@ -6,11 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-// =========================
-// Database
-// =========================
 
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection");
@@ -29,17 +25,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         });
 });
 
-
-// =========================
-// MVC
-// =========================
-
 builder.Services.AddControllersWithViews();
 
 
-// =========================
-// GitHub API
-// =========================
+// ============================================================
+// GITHUB
+// ============================================================
+
+var githubToken =
+    builder.Configuration["GitHub:Token"];
 
 builder.Services.AddHttpClient<GitHubService>(client =>
 {
@@ -57,32 +51,31 @@ builder.Services.AddHttpClient<GitHubService>(client =>
     client.DefaultRequestHeaders.Add(
         "User-Agent",
         "Gitbers");
+
+    if (!string.IsNullOrWhiteSpace(githubToken))
+    {
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue(
+                "Bearer",
+                githubToken);
+    }
 });
 
 
-// =========================
-// Services
-// =========================
+// ============================================================
+// SERVICES
+// ============================================================
 
 builder.Services.AddScoped<MetricsService>();
-
-builder.Services.Configure<ViberSettings>(
-    builder.Configuration.GetSection("Viber"));
-
-builder.Services.AddHttpClient<ViberService>();
-
-// =========================
-// Password hashing
-// =========================
 
 builder.Services.AddScoped<
     IPasswordHasher<User>,
     PasswordHasher<User>>();
 
 
-// =========================
-// Session
-// =========================
+// ============================================================
+// SESSION
+// ============================================================
 
 builder.Services.AddDistributedMemoryCache();
 
@@ -92,14 +85,13 @@ builder.Services.AddSession(options =>
         TimeSpan.FromHours(2);
 
     options.Cookie.HttpOnly = true;
-
     options.Cookie.IsEssential = true;
 });
 
 
-// =========================
-// Authentication
-// =========================
+// ============================================================
+// AUTHENTICATION
+// ============================================================
 
 builder.Services
     .AddAuthentication(
@@ -118,28 +110,20 @@ builder.Services
         options.SlidingExpiration = true;
     });
 
-
-// =========================
-// Authorization
-// =========================
-
 builder.Services.AddAuthorization();
 
 
+// ============================================================
+// APPLICATION
+// ============================================================
+
 var app = builder.Build();
-
-
-// =========================
-// Middleware
-// =========================
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-
     app.UseHsts();
 }
-
 
 app.UseHttpsRedirection();
 
@@ -147,35 +131,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-
-// =========================
-// Session
-// =========================
-
 app.UseSession();
-
-
-// =========================
-// Authentication
-// =========================
 
 app.UseAuthentication();
 
-
-// =========================
-// Authorization
-// =========================
-
 app.UseAuthorization();
-
-
-// =========================
-// Routing
-// =========================
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
+    pattern:
+        "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

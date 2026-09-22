@@ -3,57 +3,176 @@
 @{
     ViewData["Title"] = "Результати опитування";
 
-    var answers =
-        ViewBag.Answers as List<Gitbers.Models.SurveyAnswer>
-        ?? new List<Gitbers.Models.SurveyAnswer>();
-
-    double average = answers.Any()
-        ? answers.Average(a => a.Score)
-        : 0;
-
-    double score = average / 5 * 100;
+    var respondentCount = (int)ViewBag.RespondentCount;
+    var questionAverages = (double[])ViewBag.QuestionAverages;
+    var climateScore = (double)ViewBag.ClimateScore;
+    var climateLevel = (string)ViewBag.ClimateLevel;
 }
 
-<div class="container mt-4">
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-    <div class="card shadow-sm">
+    <div>
+        <h1>Результати опитування</h1>
+        <p class="text-muted mb-0">
+            @Model.Title
+        </p>
+    </div>
 
-        <div class="card-body text-center p-5">
+    <a asp-controller="Team"
+       asp-action="Details"
+       asp-route-id="@Model.TeamId"
+       class="btn btn-secondary">
+        Назад до команди
+    </a>
 
-            <h1>
-                Дякуємо за участь!
-            </h1>
+</div>
 
-            <p class="text-muted">
-                Твої відповіді були збережені анонімно.
-            </p>
+<!-- Загальний показник -->
 
-            <div class="display-4 fw-bold mt-4">
-                @Math.Round(score, 1)
-            </div>
+<div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
 
-            <p class="text-muted">
-                Середній індекс опитування
-            </p>
+        <h4 class="text-muted">
+            Загальний показник психологічного клімату
+        </h4>
 
-            <div class="progress mt-4"
-                 style="height: 25px;">
+        <div class="display-3 fw-bold my-3">
+            @climateScore.ToString("0.00") / 5
+        </div>
 
-                <div class="progress-bar"
-                     role="progressbar"
-                     style="width: @score%;">
-                </div>
+        <span class="badge bg-primary fs-6 px-3 py-2">
+            @climateLevel
+        </span>
 
-            </div>
+        <p class="text-muted mt-3 mb-0">
+            Кількість респондентів:
+            <strong>@respondentCount</strong>
+        </p>
 
-            <div class="mt-4">
+    </div>
+</div>
 
-                <a asp-controller="Metrics"
-                   asp-action="Index"
-                   asp-route-id="@Model.TeamId"
-                   class="btn btn-primary">
-                    Перейти до метрик
-                </a>
+
+@if (respondentCount == 0)
+{
+    <div class="alert alert-info">
+        Поки що немає відповідей на це опитування.
+    </div>
+}
+else
+{
+    <!-- Середні значення -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="mb-4">
+                Результати за питаннями
+            </h4>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th style="width: 100px;">
+                                №
+                            </th>
+
+                            <th>
+                                Показник
+                            </th>
+
+                            <th style="width: 180px;">
+                                Середній бал
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>1</td>
+
+                            <td>
+                                Комфорт під час роботи в команді
+                            </td>
+
+                            <td>
+                                <strong>
+                                    @questionAverages[0].ToString("0.00")
+                                </strong>
+                                / 5
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>2</td>
+
+                            <td>
+                                Взаємодія між учасниками команди
+                            </td>
+
+                            <td>
+                                <strong>
+                                    @questionAverages[1].ToString("0.00")
+                                </strong>
+                                / 5
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>3</td>
+
+                            <td>
+                                Справедливість розподілу роботи
+                            </td>
+
+                            <td>
+                                <strong>
+                                    @questionAverages[2].ToString("0.00")
+                                </strong>
+                                / 5
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>4</td>
+
+                            <td>
+                                Можливість висловлювати власну думку
+                            </td>
+
+                            <td>
+                                <strong>
+                                    @questionAverages[3].ToString("0.00")
+                                </strong>
+                                / 5
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>5</td>
+
+                            <td>
+                                Загальна атмосфера в команді
+                            </td>
+
+                            <td>
+                                <strong>
+                                    @questionAverages[4].ToString("0.00")
+                                </strong>
+                                / 5
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
 
             </div>
 
@@ -61,4 +180,115 @@
 
     </div>
 
-</div>
+
+    <!-- Графік -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h4 class="mb-4">
+                Візуалізація результатів
+            </h4>
+
+            <div style="height: 350px;">
+                <canvas id="surveyChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+        const questionAverages = [
+            @questionAverages[0].ToString(
+            System.Globalization.CultureInfo.InvariantCulture
+            ),
+            @questionAverages[1].ToString(
+            System.Globalization.CultureInfo.InvariantCulture
+            ),
+            @questionAverages[2].ToString(
+            System.Globalization.CultureInfo.InvariantCulture
+            ),
+            @questionAverages[3].ToString(
+            System.Globalization.CultureInfo.InvariantCulture
+            ),
+            @questionAverages[4].ToString(
+            System.Globalization.CultureInfo.InvariantCulture
+            )
+                ];
+
+        const ctx =
+            document.getElementById("surveyChart");
+
+        if (ctx) {
+
+            new Chart(ctx, {
+
+                type: "bar",
+
+                data: {
+
+                    labels: [
+                        "Комфорт",
+                        "Взаємодія",
+                        "Розподіл роботи",
+                        "Власна думка",
+                        "Атмосфера"
+                    ],
+
+                    datasets: [{
+
+                        label: "Середній бал",
+
+                        data: questionAverages
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            max: 5,
+
+                            ticks: {
+                                stepSize: 1
+                            }
+
+                        }
+
+                    },
+
+                    plugins: {
+
+                        legend: {
+                            display: false
+                        }
+
+                    }
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

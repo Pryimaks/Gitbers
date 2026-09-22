@@ -97,28 +97,7 @@
 
                 </form>
 
-                @if (!string.IsNullOrWhiteSpace(Model.ViberConnectionCode))
-                {
-                    <div class="alert alert-info mt-4">
-
-                        <h5>Код підключення Viber</h5>
-
-                        <p>
-                            Передайте цей код учаснику команди:
-                        </p>
-
-                        <div class="fs-3 fw-bold text-center my-3">
-                            @Model.ViberConnectionCode
-                        </div>
-
-                        <p class="mb-0">
-                            Код дійсний до:
-                            @Model.ViberConnectionCodeExpiresAt?.ToLocalTime()
-                            .ToString("dd.MM.yyyy HH:mm")
-                        </p>
-
-                    </div>
-                }
+                
 
             </div>
 
